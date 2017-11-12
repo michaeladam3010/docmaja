@@ -33,6 +33,16 @@ public interface Source {
         public boolean equals(char c) {
             return get() == c;
         }
+        public boolean equals(char[] chars) {
+            for( char c : chars ) {
+                if (get() == c) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
     }
 
     abstract class Window {

@@ -1,14 +1,13 @@
 package com.docmala.parser;
 
 import java.util.ArrayDeque;
+import com.docmala.Error;
 
 public abstract class Block {
     Source.Position _start;
     Source.Position _end;
     protected ArrayDeque<Anchor> _anchors = new ArrayDeque<>();
-    protected ArrayDeque<ParseError> _errors = new ArrayDeque<>(
-
-    );
+    protected ArrayDeque<Error> _errors = new ArrayDeque<>();
 
     static public class Anchor {
         private Source.Position _position;
@@ -33,24 +32,6 @@ public abstract class Block {
         }
     }
 
-    static public class ParseError {
-        private final Source.Position _position;
-        private final String _message;
-
-        public ParseError(Source.Position position, String message) {
-            _position = position;
-            _message = message;
-        }
-
-        public Source.Position position() {
-            return _position;
-        }
-
-        public String message() {
-            return _message;
-        }
-    }
-
     public Source.Position start() {
         return _start;
     }
@@ -63,7 +44,7 @@ public abstract class Block {
         return _anchors;
     }
 
-    public ArrayDeque<ParseError> errors() {
+    public ArrayDeque<Error> errors() {
         return _errors;
     }
 

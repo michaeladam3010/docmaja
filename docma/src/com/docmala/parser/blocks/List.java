@@ -35,7 +35,7 @@ public class List extends Block {
                 }
             }
 
-            int level = 1;
+            int level = 0;
             Type type = Type.Points;
             char startChar = start.here().get();
             switch (startChar) {
@@ -59,7 +59,7 @@ public class List extends Block {
                 if (entries.isEmpty()) {
                     entries.addLast(new Entry(null, type));
                 }
-                entries = entries.getFirst().entries;
+                entries = entries.getLast().entries;
             }
             entries.addLast(new Entry(content, type));
         }
@@ -72,9 +72,9 @@ public class List extends Block {
     }
 
     public static class Entry {
-        Content text;
-        Type type;
-        ArrayDeque<Entry> entries = new ArrayDeque<>();
+        public final Content text;
+        public final Type type;
+        public ArrayDeque<Entry> entries = new ArrayDeque<>();
 
         public Entry(Content text, Type type) {
             this.text = text;

@@ -2,6 +2,7 @@ package com.docmala.parser.blocks;
 
 import com.docmala.parser.Block;
 import com.docmala.parser.Source;
+import com.docmala.Error;
 
 import java.util.ArrayDeque;
 
@@ -67,7 +68,7 @@ public class Content extends Block {
             start.moveForward();
         }
 
-        _errors.addLast(new ParseError(position, "Error while parsing anchor. Expected ']]' but got 'EndOfBlock' "));
+        _errors.addLast(new Error(position, "Error while parsing anchor. Expected ']]' but got 'EndOfBlock' "));
         return start;
     }
 
@@ -105,7 +106,7 @@ public class Content extends Block {
             start.moveForward();
         }
 
-        _errors.addLast(new ParseError(position, "Error while parsing link. Expected '>>' but got 'EndOfBlock' "));
+        _errors.addLast(new Error(position, "Error while parsing link. Expected '>>' but got 'EndOfBlock' "));
         return start;
     }
 
@@ -165,19 +166,19 @@ public class Content extends Block {
         }
 
         if( _bold ) {
-            _errors.addLast(new ParseError(start.here(), "Bold formating (\"**\") was not closed."));
+            _errors.addLast(new Error(start.here(), "Bold formating (\"**\") was not closed."));
         }
         if( _italic ) {
-            _errors.addLast(new ParseError(start.here(), "Italic formating (\"//\") was not closed."));
+            _errors.addLast(new Error(start.here(), "Italic formating (\"//\") was not closed."));
         }
         if( _monospaced ) {
-            _errors.addLast(new ParseError(start.here(), "Monospaced formating (\"''\") was not closed."));
+            _errors.addLast(new Error(start.here(), "Monospaced formating (\"''\") was not closed."));
         }
         if( _stroked ) {
-            _errors.addLast(new ParseError(start.here(), "Stroked formating (\"--\") was not closed."));
+            _errors.addLast(new Error(start.here(), "Stroked formating (\"--\") was not closed."));
         }
         if( _underlined ) {
-            _errors.addLast(new ParseError(start.here(), "Underlined formating (\"__\") was not closed."));
+            _errors.addLast(new Error(start.here(), "Underlined formating (\"__\") was not closed."));
         }
         return start;
     }

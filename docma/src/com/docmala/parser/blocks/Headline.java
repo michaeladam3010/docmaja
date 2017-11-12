@@ -24,7 +24,7 @@ public class Headline extends Content {
     @Override
     public Source.Window doParse(Source.Window start) {
 
-        while (!start.here().equals('=')) {
+        while (start.here().equals('=')) {
             _level++;
             start.moveForward();
         }
