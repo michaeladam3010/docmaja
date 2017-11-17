@@ -1,13 +1,88 @@
 package com.docmala.parser.blocks;
 
+import com.docmala.parser.Anchor;
 import com.docmala.parser.Block;
-import com.docmala.parser.Source;
+import com.docmala.parser.ISource;
 
 import java.util.ArrayDeque;
 
 public class List extends Block {
-    ArrayDeque<Entry> _entries = new ArrayDeque<>();
+    public final Block content;
+    public final Type type;
+    public final ArrayDeque<List> entries;
 
+    public List(ISource.Position start, ISource.Position end, ArrayDeque<Anchor> anchors, Block content, Type type, ArrayDeque<List> entries) {
+        super(start, end, anchors);
+        this.content = content;
+        this.type = type;
+        this.entries = entries;
+    }
+
+    public static class Builder {
+        private ISource.Position start;
+        private ISource.Position end;
+        private ArrayDeque<Anchor> anchors = new ArrayDeque<>();
+        private Block content;
+        private List.Type type;
+        private ArrayDeque<Builder> entries = new ArrayDeque<>();
+
+        public Builder setStart(ISource.Position start) {
+            this.start = start;
+            return this;
+        }
+
+        public Builder setEnd(ISource.Position end) {
+            this.end = end;
+            return this;
+        }
+
+        public Builder addAnchors(ArrayDeque<Anchor> anchors) {
+            this.anchors.addAll(anchors);
+            return this;
+        }
+
+        public Builder setContent(Block content) {
+            this.content = content;
+            return this;
+        }
+
+        public Builder setType(List.Type type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder add(int level, Builder entry) {
+            if( level == 0 ) {
+                entries.add(entry);
+            } else {
+                if( entries.isEmpty() ) {
+                    Builder builder = new Builder();
+                    builder.setStart(entry.start);
+                    builder.setEnd(entry.end);
+                    builder.setType(entry.type);
+                    entries.add( builder );
+
+                }
+                entries.getLast().add(level-1, entry);
+            }
+            return this;
+        }
+
+        public List build() {
+
+            ArrayDeque<List> e = new ArrayDeque<>();
+            for(Builder b: entries )
+                e.add(b.build());
+
+            return new List(start, end, anchors, content, type, e);
+        }
+    }
+
+    public enum Type {
+        Points, Numbers
+    }
+
+    /*
     public ArrayDeque<Entry> entries() {
         return _entries;
     }
@@ -23,10 +98,10 @@ public class List extends Block {
     }
 
     @Override
-    protected Source.Window doParse(Source.Window start) {
+    protected ISource.Window doParse(ISource.Window start, Document document) {
         while (!start.here().isEof()) {
 
-            Source.Window begin = start.copy();
+            ISource.Window begin = start.copy();
             if (start.here().isNewLine()) {
                 start.moveForward();
                 start.skipWhitspaces();
@@ -52,8 +127,8 @@ public class List extends Block {
                 start.moveForward();
             }
 
-            Content content = new Content();
-            start = content.parse(start);
+            Content content = new Builder().createContent();
+            start = content.parse(start, document);
             ArrayDeque<Entry> entries = _entries;
             for (int i = 1; i < level; i++) {
                 if (entries.isEmpty()) {
@@ -72,13 +147,14 @@ public class List extends Block {
     }
 
     public static class Entry {
-        public final Content text;
+        public final Content content;
         public final Type type;
         public ArrayDeque<Entry> entries = new ArrayDeque<>();
 
-        public Entry(Content text, Type type) {
-            this.text = text;
+        public Entry(Content content, Type type) {
+            this.content = content;
             this.type = type;
         }
     }
+    */
 }

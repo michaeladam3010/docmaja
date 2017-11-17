@@ -1,6 +1,8 @@
 package com.docmala.plugins.ouput;
 
-import com.docmala.Document;
+import com.docmala.parser.Block;
+import com.docmala.parser.Document;
+import com.docmala.parser.FormattedText;
 import com.docmala.parser.blocks.Content;
 import com.docmala.parser.blocks.Headline;
 import com.docmala.parser.blocks.List;
@@ -14,18 +16,23 @@ public class Html {
 
     public HtmlDocument generate(Document document) {
         _html = new HtmlDocument();
-        for (Object part : document.content()) {
-            if (part instanceof Content) {
-                if (part instanceof Headline) {
-                    generateHeadline((Headline) part);
-                } else {
-                    generateContent((Content) part);
-                }
-            } else if( part instanceof List ) {
-                generateList((List)part);
-            }
+        for (Block part : document.content()) {
+            generateBlock(part);
         }
         return _html;
+    }
+
+    void generateBlock(Block block) {
+        if( block == null )
+            return;
+
+        if (block instanceof Headline) {
+            generateHeadline((Headline) block);
+        } else if( block instanceof List ) {
+            generateList((List)block);
+        } else if( block instanceof Content ) {
+            generateContent((Content) block);
+        }
     }
 
     void writeHeader() {
@@ -42,7 +49,7 @@ public class Html {
         if( content == null )
             return;
 
-        for (Content.FormattedText text : content.content()) {
+        for (FormattedText text : content.content()) {
             if (text.bold) {
                 _html.body().append("<b>");
             }
@@ -79,14 +86,14 @@ public class Html {
     }
 
     void generateHeadline(Headline headline) {
-        if (headline.level() <= 6) {
-            _html.body().append("<h").append(headline.level()).append(">");
-            generateContent(headline);
-            _html.body().append("</h").append(headline.level()).append(">");
+        if (headline.level <= 6) {
+            _html.body().append("<h").append(headline.level).append(">");
+            generateBlock(headline.content);
+            _html.body().append("</h").append(headline.level).append(">");
         }
     }
 
-    void generateListEntries(ArrayDeque<List.Entry> entries) {
+    void generateListEntries(ArrayDeque<List> entries) {
         if (entries.isEmpty())
             return;
 
@@ -103,9 +110,9 @@ public class Html {
 
         _html.body().append("<").append(type).append(" ").append(style).append(">\n");
 
-        for (List.Entry entry : entries) {
+        for (List entry : entries) {
             _html.body().append("<li> ");
-            generateContent(entry.text);
+            generateBlock(entry.content);
             generateListEntries(entry.entries);
             _html.body().append("</li> ");
 
@@ -115,7 +122,7 @@ public class Html {
     }
 
     void generateList(List list) {
-        generateListEntries(list.entries());
+        generateListEntries(list.entries.getFirst().entries);
     }
 
     static public class HtmlDocument {

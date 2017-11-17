@@ -1,6 +1,6 @@
 package com.docmala.parser;
 
-public class MemorySource implements Source {
+public class MemorySource implements ISource {
 
     protected String _fileName;
     protected String _memory;

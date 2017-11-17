@@ -9,6 +9,7 @@ public class FileSource extends MemorySource {
     public FileSource(String fileName, Charset encoding)
             throws IOException
     {
+        _fileName = fileName;
         byte[] encoded = Files.readAllBytes(Paths.get(fileName));
         _memory = new String(encoded, encoding);
     }

@@ -1,63 +1,64 @@
 package com.docmala.parser;
 
-import com.docmala.Document;
 import com.docmala.Error;
-import com.docmala.parser.blocks.*;
+import com.docmala.parser.blockParsers.*;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Parser {
-    Map<Character, Block> _blockParsers = new HashMap<>();
-
-    Document _document = new Document();
+    Document document;
 
     public ArrayDeque<Error> errors() {
-        return _errors;
+        return errors;
     }
 
-    ArrayDeque<Error> _errors = new ArrayDeque<>();
+    ArrayDeque<Error> errors = new ArrayDeque<>();
+
+    CommentParser commentParser = new CommentParser();
+    HeadlineParser headlineParser = new HeadlineParser();
+    ListParser listParser = new ListParser();
+    PluginParser pluginParser;
+    ContentParser contentParser = new ContentParser();
 
     public Parser() {
-        addBlockParser(new Comment());
-        addBlockParser(new List());
-        addBlockParser(new Headline());
-        addBlockParser(new Plugin());
     }
 
-    public void addBlockParser( Block block ) {
-        String indicators = block.indicators();
-        for( char c: indicators.toCharArray()) {
-            _blockParsers.put(c, block);
-        }
-    }
+    public void parse(ISourceProvider sourceProvider, String fileName) throws IOException {
+        document = new Document();
 
-    public void parse(Source source) {
-        Source.Window window = source.begin();
+        ISourceProvider thisSourceProvider = sourceProvider.subProvider(fileName);
+        String thisFileName = sourceProvider.getFileName(fileName);
+        ISource source = thisSourceProvider.get(thisFileName);
+
+        pluginParser = new PluginParser(thisSourceProvider);
+
+        ISource.Window window = source.begin();
 
         while( !window.here().isEof() ) {
-
-            Block bl = _blockParsers.get(window.here().get());
-            if( bl != null ) {
-                Block b = bl.create();
-                if (b != null) {
-                    window = b.parse(window);
-                    _document.append(b);
-                    _errors.addAll(b._errors);
-                }
-            } else {
-                Block b = new Content();
-                window = b.parse(window);
-                _document.append(b);
-                _errors.addAll(b._errors);
-            }
             while( window.here().isNewLine() )
                 window.moveForward();
+
+            if( commentParser.tryParse(window, document) ) {
+                errors.addAll(commentParser.errors());
+                continue;
+            } else if( headlineParser.tryParse(window, document) ) {
+                errors.addAll(headlineParser.errors());
+                continue;
+            } else if( listParser.tryParse(window, document) ) {
+                errors.addAll(listParser.errors());
+                continue;
+            } else if( pluginParser.tryParse(window, document) ) {
+                errors.addAll(pluginParser.errors());
+                continue;
+            }
+
+            contentParser.tryParse(window, document);
+
         }
     }
 
     public Document document() {
-        return _document;
+        return document;
     }
 }

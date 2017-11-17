@@ -1,11 +1,13 @@
 package com.docmala;
 
+import com.docmala.parser.ISourceProvider;
+import com.docmala.parser.LocalFileSourceProvider;
 import com.docmala.plugins.ouput.Html;
-import com.docmala.parser.FileSource;
 import com.docmala.parser.Parser;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Main {
 
@@ -14,7 +16,8 @@ public class Main {
         Parser p = new Parser();
 
         try {
-            p.parse( new FileSource("/home/michael/test.docma", Charset.defaultCharset() ) );
+            ISourceProvider sourceProvider = new LocalFileSourceProvider(Paths.get("/home/michael/"));
+            p.parse( sourceProvider, "test.docma" );
             Html htmlOutput = new Html();
             Html.HtmlDocument doc = htmlOutput.generate(p.document());
             doc.write("/home/michael/temp/out.html");

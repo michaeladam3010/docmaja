@@ -1,12 +1,11 @@
 package com.docmala.parser;
 
 import com.docmala.Error;
-import com.docmala.Parameter;
 
 import java.util.ArrayDeque;
 
 public class ParameterParser {
-    Parameter _parameter;
+    Parameter parameter;
 
     public ArrayDeque<Error> errors() {
         return _errors;
@@ -15,13 +14,13 @@ public class ParameterParser {
     protected ArrayDeque<Error> _errors;
 
     public Parameter parameter() {
-        return _parameter;
+        return parameter;
     }
 
-    public Source.Window parse(Source.Window start, char[] end) {
+    public ISource.Window parse(ISource.Window start, char[] end) {
         _errors = new ArrayDeque<>();
         start.skipWhitspaces();
-        Source.Position begin = start.here();
+        ISource.Position begin = start.here();
         StringBuilder name = new StringBuilder();
         StringBuilder value = new StringBuilder();
 
@@ -68,7 +67,7 @@ public class ParameterParser {
             }
         }
 
-        _parameter = new Parameter(name.toString().trim(), value.toString(), begin);
+        parameter = new Parameter(name.toString().trim(), value.toString(), begin);
         return start;
     }
 }

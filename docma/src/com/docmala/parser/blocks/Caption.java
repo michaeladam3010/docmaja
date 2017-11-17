@@ -1,9 +1,6 @@
 package com.docmala.parser.blocks;
 
-import com.docmala.parser.Block;
-import com.docmala.parser.Source;
-
-public class Caption extends Content {
+public class Caption { /*extends Content {
 
     @Override
     public String indicators() {
@@ -16,8 +13,8 @@ public class Caption extends Content {
     }
 
     @Override
-    public Source.Window doParse(Source.Window start) {
+    public ISource.Window doParse(ISource.Window start, Document document) {
         start.moveForward();
-        return super.doParse(start);
-    }
+        return super.doParse(start, document);
+    }*/
 }

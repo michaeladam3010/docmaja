@@ -1,17 +1,17 @@
 package com.docmala;
 
-import com.docmala.parser.Source;
+import com.docmala.parser.ISource;
 
 public class Error {
-    private final Source.Position _position;
+    private final ISource.Position _position;
     private final String _message;
 
-    public Error(Source.Position position, String message) {
+    public Error(ISource.Position position, String message) {
         _position = position;
         _message = message;
     }
 
-    public Source.Position position() {
+    public ISource.Position position() {
         return _position;
     }
 

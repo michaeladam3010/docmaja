@@ -2,13 +2,14 @@ package com.docmala.parser;
 
 import java.util.ListIterator;
 
-public interface Source {
+public interface ISource {
     abstract class Position {
         protected int _line = 1;
         protected int _column = 1;
         protected String _fileName = "";
 
         Position() {}
+
         public abstract Position copy();
 
         public abstract char get();
