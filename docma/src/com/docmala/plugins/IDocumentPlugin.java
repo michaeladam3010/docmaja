@@ -14,6 +14,6 @@ public interface IDocumentPlugin {
 
     ArrayDeque<Error> errors();
 
-    void process(ArrayDeque<Parameter> parameters, Document document, ISourceProvider sourceProvider);
+    void process(ArrayDeque<Parameter> parameters, String block, Document document, ISourceProvider sourceProvider);
 
 }

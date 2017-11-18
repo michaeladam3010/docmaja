@@ -22,7 +22,7 @@ public class include implements IDocumentPlugin{
     }
 
     @Override
-    public void process(ArrayDeque<Parameter> parameters, Document document, ISourceProvider sourceProvider) {
+    public void process(ArrayDeque<Parameter> parameters, String block, Document document, ISourceProvider sourceProvider) {
         Parser parser = new Parser();
         Parameter file = null;
 
@@ -40,8 +40,8 @@ public class include implements IDocumentPlugin{
 
         try {
             parser.parse( sourceProvider, file.value() );
-            for( Block block : parser.document().content() ) {
-                document.append(block);
+            for( Block documentBlock : parser.document().content() ) {
+                document.append(documentBlock);
             }
         } catch (IOException e) {
             errors.addLast(new Error(file.position(), "Unable to open file: '" + file.value() + "'."));
