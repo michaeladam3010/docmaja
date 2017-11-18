@@ -1,0 +1,35 @@
+; mltc ...
+  line 2
+; test comment 
+; ...
+    
+; ...
+
+= H1
+
+text is here
+text with << link >> link
+text with << link, blubb blubb blubb >> link and text
+
+== H2
+text with [[anchor]] anchor
+test //italic// __**bold underline**__ ''mono'' --stroked--
+
+* t0
+* This text ...
+    is using two lines
+** t2
+* t3
+## asdf
+## ghjk
+## lmno
+* t4
+
+[formula]
+----
+a+b
+----
+
+[include, file=included.docma]
+
+textt
