@@ -2,6 +2,7 @@ package com.docmala.plugins.document;
 
 import com.docmala.Error;
 import com.docmala.parser.*;
+import com.docmala.parser.blocks.Caption;
 import com.docmala.parser.blocks.Image;
 import com.docmala.plugins.IDocumentPlugin;
 import com.docmala.plugins.document.internal_formula.VanesaFormulaParseRules;
@@ -88,6 +89,10 @@ public class formula implements IDocumentPlugin {
         Image.Builder imageBuilder = new Image.Builder();
         imageBuilder.setData(bytes);
         imageBuilder.setFileType("svg+xml");
+
+        if( document.content().getLast() instanceof Caption) {
+            imageBuilder.setCaption((Caption)document.content().pollLast());
+        }
         document.append(imageBuilder.build());
     }
 

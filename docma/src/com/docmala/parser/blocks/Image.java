@@ -9,11 +9,13 @@ import java.util.ArrayDeque;
 public class Image extends Block {
     public final byte[] data;
     public final String fileType;
+    public final Caption caption;
 
-    public Image(ISource.Position start, ISource.Position end, ArrayDeque<Anchor> anchors, byte[] data, String fileType) {
+    public Image(ISource.Position start, ISource.Position end, ArrayDeque<Anchor> anchors, byte[] data, String fileType, Caption caption) {
         super(start, end, anchors);
         this.data = data;
         this.fileType = fileType;
+        this.caption = caption;
     }
 
     public static class Builder {
@@ -22,6 +24,7 @@ public class Image extends Block {
         private ArrayDeque<Anchor> anchors;
         private byte[] data;
         private String fileType;
+        private Caption caption = null;
 
         public Builder setStart(ISource.Position start) {
             this.start = start;
@@ -48,8 +51,13 @@ public class Image extends Block {
             return this;
         }
 
+        public Builder setCaption(Caption caption) {
+            this.caption = caption;
+            return this;
+        }
+
         public Image build() {
-            return new Image(start, end, anchors, data, fileType);
+            return new Image(start, end, anchors, data, fileType, caption);
         }
     }
 }

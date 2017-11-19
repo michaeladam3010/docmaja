@@ -10,12 +10,14 @@ public class List extends Block {
     public final Block content;
     public final Type type;
     public final ArrayDeque<List> entries;
+    public final Caption caption;
 
-    public List(ISource.Position start, ISource.Position end, ArrayDeque<Anchor> anchors, Block content, Type type, ArrayDeque<List> entries) {
+    public List(ISource.Position start, ISource.Position end, ArrayDeque<Anchor> anchors, Block content, Type type, ArrayDeque<List> entries, Caption caption) {
         super(start, end, anchors);
         this.content = content;
         this.type = type;
         this.entries = entries;
+        this.caption = caption;
     }
 
     public enum Type {
@@ -29,6 +31,13 @@ public class List extends Block {
         private Block content;
         private List.Type type;
         private ArrayDeque<Builder> entries = new ArrayDeque<>();
+
+        public Builder setCaption(Caption caption) {
+            this.caption = caption;
+            return this;
+        }
+
+        private Caption caption = null;
 
         public Builder setStart(ISource.Position start) {
             this.start = start;
@@ -78,7 +87,7 @@ public class List extends Block {
             for (Builder b : entries)
                 e.add(b.build());
 
-            return new List(start, end, anchors, content, type, e);
+            return new List(start, end, anchors, content, type, e, caption);
         }
     }
 

@@ -25,10 +25,23 @@ public class CaptionParser implements IBlockParser, IBlockHolder {
 
         if (start.here().equals('.')) {
             caption = new Caption.Builder();
-            caption = new Caption.Builder();
             caption.setStart(start.here());
 
-            //TODO: parse type ('[type]')
+            start.skipWhitspaces();
+            if( start.here().equals('[') && !start.next().equals('[') ) {
+                start.moveForward();
+                StringBuilder type = new StringBuilder();
+                while(!start.here().isBlockEnd() && !start.here().equals(']')) {
+                    type.append(start.here().get());
+                    start.moveForward();
+                }
+                if( start.here().equals("]")) {
+                    caption.setType(type.toString().trim());
+                } else {
+                    errors.addLast(new Error(start.here(), "Caption type definition (\"[<type>]\") was not closed."));
+                }
+            }
+
             contentParser.tryParse(start, this);
 
             errors.addAll(contentParser.errors());

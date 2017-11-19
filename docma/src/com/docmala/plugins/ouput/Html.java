@@ -42,11 +42,14 @@ public class Html {
     }
 
     private void generateImage(Image image) {
+        _html.body().append("<figure>");
         _html.body().append("<img src=\"data:image/");
         _html.body().append(image.fileType);
         _html.body().append(";base64,");
         _html.body().append(Base64.getEncoder().encodeToString(image.data));
         _html.body().append("\">");
+
+        _html.body().append("</figure>");
     }
 
     void writeHeader() {
