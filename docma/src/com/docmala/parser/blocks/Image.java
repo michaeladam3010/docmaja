@@ -7,7 +7,7 @@ import com.docmala.parser.ISource;
 import java.util.ArrayDeque;
 
 public class Image extends Block {
-    public final byte [] data;
+    public final byte[] data;
     public final String fileType;
 
     public Image(ISource.Position start, ISource.Position end, ArrayDeque<Anchor> anchors, byte[] data, String fileType) {

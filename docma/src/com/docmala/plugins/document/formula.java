@@ -1,25 +1,25 @@
 package com.docmala.plugins.document;
 
 import com.docmala.Error;
-import com.docmala.parser.DataBlock;
-import com.docmala.parser.Document;
-import com.docmala.parser.ISourceProvider;
-import com.docmala.parser.Parameter;
+import com.docmala.parser.*;
 import com.docmala.parser.blocks.Image;
 import com.docmala.plugins.IDocumentPlugin;
+import com.docmala.plugins.document.internal_formula.VanesaFormulaParseRules;
 import com.docmala.plugins.document.internal_formula.antlr.VanesaFormulaLexer;
 import com.docmala.plugins.document.internal_formula.antlr.VanesaFormulaParser;
-import com.docmala.plugins.document.internal_formula.VanesaFormulaParseRules;
+import org.antlr.v4.runtime.*;
+import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.svggen.SVGGeneratorContext;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
-import org.antlr.v4.runtime.*;
+import org.w3c.dom.DOMImplementation;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayDeque;
 
 public class formula implements IDocumentPlugin {
@@ -54,7 +54,7 @@ public class formula implements IDocumentPlugin {
     }
 
     @Override
-    public void process(ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
+    public void process(ISource.Position start, ISource.Position end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
         System.out.printf("%s%n", test(block.data));
 
         TeXFormula latexFormula = new TeXFormula(test(block.data));
@@ -65,24 +65,29 @@ public class formula implements IDocumentPlugin {
         // insert a border
         icon.setInsets(new Insets(5, 5, 5, 5));
 
-        BufferedImage image = new BufferedImage(icon.getIconWidth(),
-                icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = image.createGraphics();
-        g2.setColor(Color.white);
-        g2.fillRect(0, 0, icon.getIconWidth(), icon.getIconHeight());
+        DOMImplementation domImpl = SVGDOMImplementation.getDOMImplementation();
+        org.w3c.dom.Document documentx = domImpl.createDocument(SVGDOMImplementation.SVG_NAMESPACE_URI, "svg", null);
+        SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(documentx);
+
+        SVGGraphics2D g2 = new SVGGraphics2D(ctx, true);
+        g2.setSVGCanvasSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
+
         icon.paintIcon(null, g2, 0, 0);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] bytes = "Error".getBytes();
+
+        Writer out = new StringWriter();
         try {
-            ImageIO.write(image, "png", baos);
-        } catch (IOException e) { }
+            g2.stream(out, true);
+        } catch (SVGGraphics2DIOException e) {
+        }
 
+        String svgData = out.toString();
+        bytes = svgData.getBytes();
 
-        byte[] bytes = baos.toByteArray();
-
-        com.docmala.parser.blocks.Image.Builder imageBuilder = new Image.Builder();
-        imageBuilder.setData( bytes );
-        imageBuilder.setFileType("png");
+        Image.Builder imageBuilder = new Image.Builder();
+        imageBuilder.setData(bytes);
+        imageBuilder.setFileType("svg+xml");
         document.append(imageBuilder.build());
     }
 

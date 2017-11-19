@@ -11,6 +11,7 @@ repositories {
 dependencies {
     compile 'org.scilab.forge:jlatexmath:1.0.6'
     antlr "org.antlr:antlr4:4.7"
+    compile 'batik:batik-svggen:1.6-1'
 }
 
 sourceSets.main.java.srcDirs = ['docma/src']

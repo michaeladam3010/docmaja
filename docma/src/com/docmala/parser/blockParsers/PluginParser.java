@@ -74,6 +74,7 @@ public class PluginParser implements IBlockParser {
         if (start.here().equals('[') && !start.next().equals("[")) {
             dataBlock = null;
             final char[] end = {']', ','};
+            ISource.Position begin = start.here();
 
             ParameterParser parameterParser = new ParameterParser();
             ArrayDeque<Parameter> parameters = new ArrayDeque<>();
@@ -128,7 +129,7 @@ public class PluginParser implements IBlockParser {
                 }
             }
 
-            plugin.process(parameters, dataBlock, (Document) document, sourceProvider);
+            plugin.process(begin, start.here(), parameters, dataBlock, (Document) document, sourceProvider);
             errors.addAll(plugin.errors());
 
             return true;

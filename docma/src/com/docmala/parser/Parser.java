@@ -14,6 +14,7 @@ public class Parser {
     ListParser listParser = new ListParser();
     PluginParser pluginParser;
     ContentParser contentParser = new ContentParser();
+
     public Parser() {
     }
 

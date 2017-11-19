@@ -1,10 +1,7 @@
 package com.docmala.plugins.document;
 
 import com.docmala.Error;
-import com.docmala.parser.DataBlock;
-import com.docmala.parser.Document;
-import com.docmala.parser.ISourceProvider;
-import com.docmala.parser.Parameter;
+import com.docmala.parser.*;
 import com.docmala.parser.blocks.Image;
 import com.docmala.plugins.IDocumentPlugin;
 
@@ -25,7 +22,7 @@ public class image implements IDocumentPlugin {
     }
 
     @Override
-    public void process(ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
+    public void process(ISource.Position start, ISource.Position end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
         Parameter file = null;
         Image.Builder image = new Image.Builder();
 
