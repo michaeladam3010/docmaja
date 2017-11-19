@@ -1,7 +1,5 @@
 package com.docmala.parser;
 
-import com.docmala.parser.Block;
-
 import java.util.ArrayDeque;
 
 public class Document implements IBlockHolder {

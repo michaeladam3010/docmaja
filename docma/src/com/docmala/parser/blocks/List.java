@@ -18,6 +18,10 @@ public class List extends Block {
         this.entries = entries;
     }
 
+    public enum Type {
+        Points, Numbers
+    }
+
     public static class Builder {
         private ISource.Position start;
         private ISource.Position end;
@@ -52,18 +56,18 @@ public class List extends Block {
         }
 
         public Builder add(int level, Builder entry) {
-            if( level == 0 ) {
+            if (level == 0) {
                 entries.add(entry);
             } else {
-                if( entries.isEmpty() ) {
+                if (entries.isEmpty()) {
                     Builder builder = new Builder();
                     builder.setStart(entry.start);
                     builder.setEnd(entry.end);
                     builder.setType(entry.type);
-                    entries.add( builder );
+                    entries.add(builder);
 
                 }
-                entries.getLast().add(level-1, entry);
+                entries.getLast().add(level - 1, entry);
             }
             return this;
         }
@@ -71,15 +75,11 @@ public class List extends Block {
         public List build() {
 
             ArrayDeque<List> e = new ArrayDeque<>();
-            for(Builder b: entries )
+            for (Builder b : entries)
                 e.add(b.build());
 
             return new List(start, end, anchors, content, type, e);
         }
-    }
-
-    public enum Type {
-        Points, Numbers
     }
 
     /*

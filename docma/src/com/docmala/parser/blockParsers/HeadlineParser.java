@@ -1,7 +1,10 @@
 package com.docmala.parser.blockParsers;
 
-import com.docmala.parser.*;
 import com.docmala.Error;
+import com.docmala.parser.Block;
+import com.docmala.parser.IBlockHolder;
+import com.docmala.parser.IBlockParser;
+import com.docmala.parser.ISource;
 import com.docmala.parser.blocks.Headline;
 
 import java.util.ArrayDeque;
@@ -20,7 +23,7 @@ public class HeadlineParser implements IBlockParser, IBlockHolder {
     public boolean tryParse(ISource.Window start, IBlockHolder document) {
         errors.clear();
 
-        if( start.here().equals('=')) {
+        if (start.here().equals('=')) {
             headline = new Headline.Builder();
             headline.setStart(start.here());
 

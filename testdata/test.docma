@@ -25,9 +25,11 @@ test //italic// __**bold underline**__ ''mono'' --stroked--
 ## lmno
 * t4
 
+[image, file="test1.png"]
+
 [formula]
 ----
-a+b
+(a_1 / (b_1 + sqrt(c))^2) + sin(a_2 * b_2)
 ----
 
 [include, file=included.docma]

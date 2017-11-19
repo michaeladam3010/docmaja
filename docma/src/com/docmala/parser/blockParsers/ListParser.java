@@ -28,9 +28,9 @@ public class ListParser implements IBlockParser, IBlockHolder {
 
     @Override
     public boolean tryParse(ISource.Window start, IBlockHolder document) {
-        char [] listIndicators = {'*', '#'};
+        char[] listIndicators = {'*', '#'};
 
-        if( start.here().equals(listIndicators)) {
+        if (start.here().equals(listIndicators)) {
             list.setStart(start.here());
             while (!start.here().isEof()) {
 

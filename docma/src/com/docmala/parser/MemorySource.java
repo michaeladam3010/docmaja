@@ -5,13 +5,20 @@ public class MemorySource implements ISource {
     protected String _fileName;
     protected String _memory;
 
+    @Override
+    public Window begin() {
+        Window win = new MemoryWindow();
+        return win;
+    }
+
+    ;
+
     class MemoryWindow extends Window {
         MemoryPosition _previous;
         MemoryPosition _here = new MemoryPosition();
         MemoryPosition _next = new MemoryPosition();
 
-        public MemoryWindow()
-        {
+        public MemoryWindow() {
             _here.moveForward();
             _next.moveForward();
             _next.moveForward();
@@ -52,16 +59,10 @@ public class MemorySource implements ISource {
 
         @Override
         public void setTo(Window window) {
-            _previous = new MemoryPosition((MemoryPosition)window.previous());
-            _here = new MemoryPosition((MemoryPosition)window.here());
-            _next = new MemoryPosition((MemoryPosition)window.next());
+            _previous = new MemoryPosition((MemoryPosition) window.previous());
+            _here = new MemoryPosition((MemoryPosition) window.here());
+            _next = new MemoryPosition((MemoryPosition) window.next());
         }
-    };
-
-    @Override
-    public Window begin() {
-        Window win = new MemoryWindow();
-        return win;
     }
 
     public class MemoryPosition extends Position {
@@ -72,7 +73,7 @@ public class MemorySource implements ISource {
             this._fileName = MemorySource.this._fileName;
         }
 
-        MemoryPosition( MemoryPosition other ) {
+        MemoryPosition(MemoryPosition other) {
             _index = other._index;
             _fileName = other._fileName;
             _column = other._column;
@@ -96,12 +97,12 @@ public class MemorySource implements ISource {
         }
 
         public void moveForward() {
-            if( _index < 0 ) {
+            if (_index < 0) {
                 _index++;
                 return;
             }
 
-            if( isEof() ) {
+            if (isEof()) {
                 return;
             }
 
@@ -118,17 +119,17 @@ public class MemorySource implements ISource {
 
             _index++;
 
-            if( isEof() ) {
+            if (isEof()) {
                 return;
             }
 
             if (_memory.charAt(_index) == '.' && (_index == 0 || _memory.charAt(_index - 1) != '\\')) {
-                if( _memory.length() > _index + 3 && _memory.charAt(_index+1) == '.' && _memory.charAt(_index+2) == '.' ) {
+                if (_memory.length() > _index + 3 && _memory.charAt(_index + 1) == '.' && _memory.charAt(_index + 2) == '.') {
                     MemoryPosition tst = new MemoryPosition();
                     tst._index = _index + 3;
                     tst._column = _column + 3;
                     tst._line = _line;
-                    if( tst.isNewLine() ) {
+                    if (tst.isNewLine()) {
                         tst.moveForward();
                         while (tst.isWhitespace()) {
                             tst.moveForward();

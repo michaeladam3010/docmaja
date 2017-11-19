@@ -5,10 +5,14 @@ import com.docmala.parser.Document;
 import com.docmala.parser.FormattedText;
 import com.docmala.parser.blocks.Content;
 import com.docmala.parser.blocks.Headline;
+import com.docmala.parser.blocks.Image;
 import com.docmala.parser.blocks.List;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.Base64;
 
 public class Html {
 
@@ -23,16 +27,26 @@ public class Html {
     }
 
     void generateBlock(Block block) {
-        if( block == null )
+        if (block == null)
             return;
 
         if (block instanceof Headline) {
             generateHeadline((Headline) block);
-        } else if( block instanceof List ) {
-            generateList((List)block);
-        } else if( block instanceof Content ) {
+        } else if (block instanceof List) {
+            generateList((List) block);
+        } else if (block instanceof Image) {
+            generateImage((Image) block);
+        } else if (block instanceof Content) {
             generateContent((Content) block);
         }
+    }
+
+    private void generateImage(Image image) {
+        _html.body().append("<img src=\"data:image/");
+        _html.body().append(image.fileType);
+        _html.body().append(";base64,");
+        _html.body().append(Base64.getEncoder().encodeToString(image.data));
+        _html.body().append("\">");
     }
 
     void writeHeader() {
@@ -46,7 +60,7 @@ public class Html {
     }
 
     void generateContent(Content content) {
-        if( content == null )
+        if (content == null)
             return;
 
         for (FormattedText text : content.content()) {

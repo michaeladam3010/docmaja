@@ -5,13 +5,12 @@ import com.docmala.Error;
 import java.util.ArrayDeque;
 
 public class ParameterParser {
+    protected ArrayDeque<Error> _errors;
     Parameter parameter;
 
     public ArrayDeque<Error> errors() {
         return _errors;
     }
-
-    protected ArrayDeque<Error> _errors;
 
     public Parameter parameter() {
         return parameter;
@@ -42,27 +41,27 @@ public class ParameterParser {
 
             boolean searchQuotationMark = start.here().equals('"');
             boolean isQuotedParameter = searchQuotationMark;
-            if( searchQuotationMark ) {
+            if (searchQuotationMark) {
                 start.moveForward();
             }
 
             while (!start.here().isBlockEnd()) {
-                if (searchQuotationMark && start.here().equals('"') ) {
+                if (searchQuotationMark && start.here().equals('"')) {
                     searchQuotationMark = false;
                     start.moveForward();
                     start.skipWhitspaces();
-                    if( !start.here().equals(end) ) {
+                    if (!start.here().equals(end)) {
                         _errors.addLast(new Error(start.here(), "Expected: " + end));
                     }
                     break;
                 }
-                if( !searchQuotationMark && start.here().equals(end)) {
+                if (!searchQuotationMark && start.here().equals(end)) {
                     break;
                 }
                 value.append(start.here().get());
                 start.moveForward();
             }
-            if( searchQuotationMark ) {
+            if (searchQuotationMark) {
                 _errors.addLast(new Error(start.here(), "Expected: '\"'"));
             }
         }

@@ -18,7 +18,7 @@ public class CommentParser implements IBlockParser {
 
     @Override
     public boolean tryParse(ISource.Window start, IBlockHolder document) {
-        if( start.here().equals(';')) {
+        if (start.here().equals(';')) {
             Comment.Builder builder = new Comment.Builder();
             builder.setStart(start.here());
 

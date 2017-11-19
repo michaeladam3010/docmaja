@@ -2,7 +2,9 @@ package com.docmala.parser;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class LocalFileSourceProvider implements ISourceProvider {
     final Path basePath;
@@ -13,7 +15,12 @@ public class LocalFileSourceProvider implements ISourceProvider {
 
     @Override
     public ISource get(String fileName) throws IOException {
-        return new FileSource(basePath.resolve(fileName).toString(), Charset.defaultCharset() );
+        return new FileSource(basePath.resolve(fileName).toString(), Charset.defaultCharset());
+    }
+
+    @Override
+    public byte[] getBinary(String fileName) throws IOException {
+        return Files.readAllBytes(basePath.resolve(fileName));
     }
 
     @Override

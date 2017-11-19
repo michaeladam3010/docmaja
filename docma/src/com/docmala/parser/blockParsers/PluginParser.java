@@ -7,43 +7,51 @@ import com.docmala.plugins.IDocumentPlugin;
 import java.util.ArrayDeque;
 
 public class PluginParser implements IBlockParser {
-    ArrayDeque<Error> errors = new ArrayDeque<>();
     final ISourceProvider sourceProvider;
     final StringBuilder block = new StringBuilder();
+    DataBlock dataBlock;
+    ArrayDeque<Error> errors = new ArrayDeque<>();
 
     public PluginParser(ISourceProvider sourceProvider) {
         this.sourceProvider = sourceProvider;
     }
 
     boolean parseBlock(ISource.Window start) {
+        block.setLength(0);
         ISource.Window begin = start.copy();
         start.skipWhitspaces();
-        if( start.here().isNewLine() ) {
+        DataBlock.Builder dataBlockBuilder = new DataBlock.Builder();
+        if (start.here().isNewLine()) {
             start.moveForward();
             int level = 0;
-            while (start.here().equals('-') ) {
+            while (start.here().equals('-')) {
                 level++;
                 start.moveForward();
             }
 
-            while (!start.here().isBlockEnd() ) {
+            while (!start.here().isBlockEnd()) {
                 start.moveForward();
             }
 
-            while (!start.here().isEof() ) {
+            dataBlockBuilder.setPosition(start.here());
+
+            while (!start.here().isEof()) {
                 int endLevel = 0;
                 start.moveForward();
 
-                if( start.here().equals('-') ) {
-                    while (start.here().equals('-') ) {
+                if (start.here().equals('-')) {
+                    while (start.here().equals('-')) {
                         endLevel++;
                         start.moveForward();
                     }
-                    if( endLevel >= level ) {
+
+                    if (endLevel >= level) {
                         start.skipWhitspaces();
+                        dataBlockBuilder.setData(block.toString());
+                        dataBlock = dataBlockBuilder.build();
                         return true;
                     } else {
-                        for( int i = 0; i < endLevel; i++ ) {
+                        for (int i = 0; i < endLevel; i++) {
                             block.append('-');
                         }
                         continue;
@@ -63,8 +71,8 @@ public class PluginParser implements IBlockParser {
 
     @Override
     public boolean tryParse(ISource.Window start, IBlockHolder document) {
-        if( start.here().equals('[') && !start.next().equals("[")) {
-            block.setLength(0);
+        if (start.here().equals('[') && !start.next().equals("[")) {
+            dataBlock = null;
             final char[] end = {']', ','};
 
             ParameterParser parameterParser = new ParameterParser();
@@ -73,7 +81,7 @@ public class PluginParser implements IBlockParser {
             while (!start.here().isBlockEnd()) {
                 start.skipWhitspaces();
 
-                if( start.here().equals(']') ) {
+                if (start.here().equals(']')) {
                     break;
                 }
                 start.moveForward();
@@ -83,7 +91,7 @@ public class PluginParser implements IBlockParser {
                 errors.addAll(parameterParser.errors());
             }
 
-            if( !start.here().equals(']') ) {
+            if (!start.here().equals(']')) {
                 errors.addLast(new Error(start.here(), "Expected ']'"));
             } else {
                 start.moveForward();
@@ -95,10 +103,10 @@ public class PluginParser implements IBlockParser {
             try {
                 Class<?> p = null;
                 p = Class.forName("com.docmala.plugins.document." + pluginParameter.name());
-                if( !IDocumentPlugin.class.isAssignableFrom(p) ) {
+                if (!IDocumentPlugin.class.isAssignableFrom(p)) {
                     throw new ClassNotFoundException();
                 }
-                plugin = (IDocumentPlugin)p.newInstance();
+                plugin = (IDocumentPlugin) p.newInstance();
             } catch (ClassNotFoundException e) {
                 errors.add(new Error(start.here(), "Plugin '" + pluginParameter.name() + "' not found."));
                 return true;
@@ -111,16 +119,16 @@ public class PluginParser implements IBlockParser {
             }
             IDocumentPlugin.BlockProcessing blockProcessing = plugin.blockProcessing();
 
-            if( blockProcessing != IDocumentPlugin.BlockProcessing.No ) {
-                if( !parseBlock(start) ) {
-                    if( blockProcessing != IDocumentPlugin.BlockProcessing.Required ) {
+            if (blockProcessing != IDocumentPlugin.BlockProcessing.No) {
+                if (!parseBlock(start)) {
+                    if (blockProcessing != IDocumentPlugin.BlockProcessing.Required) {
                         errors.add(new Error(start.here(), "Plugin '" + pluginParameter.name() + "' requires a data block ('----')."));
 
                     }
                 }
             }
 
-            plugin.process(parameters, block.toString(), (Document)document, sourceProvider);
+            plugin.process(parameters, dataBlock, (Document) document, sourceProvider);
             errors.addAll(plugin.errors());
 
             return true;

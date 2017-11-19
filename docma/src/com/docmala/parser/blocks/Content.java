@@ -16,7 +16,9 @@ public class Content extends Block {
         this.content = content;
     }
 
-    public ArrayDeque<FormattedText> content() { return content; }
+    public ArrayDeque<FormattedText> content() {
+        return content;
+    }
 
     public static class Builder {
         private ISource.Position start;

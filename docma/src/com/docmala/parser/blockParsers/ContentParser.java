@@ -1,7 +1,7 @@
 package com.docmala.parser.blockParsers;
 
-import com.docmala.parser.*;
 import com.docmala.Error;
+import com.docmala.parser.*;
 import com.docmala.parser.blocks.Content;
 
 import java.util.ArrayDeque;
@@ -74,16 +74,16 @@ public class ContentParser implements IBlockParser {
             if (isLinkEnd(start)) {
 
                 formattedText.setType(FormattedText.Link.Type.IntraFile);
-                if( url.contains("://") ) {
+                if (url.contains("://")) {
                     formattedText.setType(FormattedText.Link.Type.Web);
-                } else if( url.contains(":") ) {
+                } else if (url.contains(":")) {
                     formattedText.setType(FormattedText.Link.Type.InterFile);
                 }
                 content.addContent(formattedText.buildLink());
                 start.moveForward();
                 start.moveForward();
                 return true;
-            } else if( start.here().equals(',') ) {
+            } else if (start.here().equals(',')) {
                 destination[0] = url;
             } else {
                 destination[0] += start.here().get();
@@ -98,26 +98,26 @@ public class ContentParser implements IBlockParser {
     void parseFormattedText(ISource.Window start) {
         StringBuilder text = new StringBuilder();
         while (!start.here().isBlockEnd() && !isLinkStart(start) && !isAnchorStart(start)) {
-            if( start.equals('*','*') ||
-                    start.equals('/','/') ||
-                    start.equals('\'','\'') ||
-                    start.equals('-','-') ||
-                    start.equals('_','_') ) {
-                if( text.length() != 0) {
+            if (start.equals('*', '*') ||
+                    start.equals('/', '/') ||
+                    start.equals('\'', '\'') ||
+                    start.equals('-', '-') ||
+                    start.equals('_', '_')) {
+                if (text.length() != 0) {
 
-                    content.addContent(formattedText.setText(text.toString()).build()) ;
+                    content.addContent(formattedText.setText(text.toString()).build());
                     text.setLength(0);
                 }
 
-                if( start.equals('*', '*') ) {
+                if (start.equals('*', '*')) {
                     formattedText.toggleBold();
-                } else if( start.equals('/', '/') ) {
+                } else if (start.equals('/', '/')) {
                     formattedText.toggleItalic();
-                } else if( start.equals('\'', '\'') ) {
+                } else if (start.equals('\'', '\'')) {
                     formattedText.toggleMonospaced();
-                } else if( start.equals('-', '-') ) {
+                } else if (start.equals('-', '-')) {
                     formattedText.toggleStroked();
-                } else if( start.equals('_', '_') ) {
+                } else if (start.equals('_', '_')) {
                     formattedText.toggleUnderlined();
                 }
                 start.moveForward();
@@ -128,15 +128,15 @@ public class ContentParser implements IBlockParser {
             }
         }
 
-        if( text.length() != 0 ) {
-            if( isAnchorStart(start) ) {
+        if (text.length() != 0) {
+            if (isAnchorStart(start)) {
                 // remove tailing whitespaces if an anchor is coming
                 // this is used so that content like "asdf [[anchor]] ghjk" does not have two whitespaces between asdf and ghjk
                 String tmp = text.toString().replaceAll("\\s+$", "");
                 text.setLength(0);
                 text.append(tmp);
             }
-            content.addContent( formattedText.setText(text.toString()).build());
+            content.addContent(formattedText.setText(text.toString()).build());
         }
     }
 
@@ -148,7 +148,7 @@ public class ContentParser implements IBlockParser {
         formattedText = new FormattedText.Builder();
         content.setStart(start.here());
         while (!start.here().isBlockEnd()) {
-            if( parseLink(start) || parseAnchor(start) ) {
+            if (parseLink(start) || parseAnchor(start)) {
                 continue;
             }
             parseFormattedText(start);
@@ -157,19 +157,19 @@ public class ContentParser implements IBlockParser {
         document.append(content.build());
 
 
-        if( formattedText.isBold() ) {
+        if (formattedText.isBold()) {
             errors.addLast(new Error(start.here(), "Bold formating (\"**\") was not closed."));
         }
-        if( formattedText.isItalic() ) {
+        if (formattedText.isItalic()) {
             errors.addLast(new Error(start.here(), "Italic formating (\"//\") was not closed."));
         }
-        if( formattedText.isMonospaced() ) {
+        if (formattedText.isMonospaced()) {
             errors.addLast(new Error(start.here(), "Monospaced formating (\"''\") was not closed."));
         }
-        if( formattedText.isStroked() ) {
+        if (formattedText.isStroked()) {
             errors.addLast(new Error(start.here(), "Stroked formating (\"--\") was not closed."));
         }
-        if( formattedText.isUnderlined() ) {
+        if (formattedText.isUnderlined()) {
             errors.addLast(new Error(start.here(), "Underlined formating (\"__\") was not closed."));
         }
 

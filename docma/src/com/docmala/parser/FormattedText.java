@@ -46,30 +46,13 @@ public class FormattedText {
             return bold;
         }
 
-        public boolean isItalic() {
-            return italic;
-        }
-
-        public boolean isMonospaced() {
-            return monospaced;
-        }
-
-        public boolean isStroked() {
-            return stroked;
-        }
-
-        public boolean isUnderlined() {
-            return underlined;
-        }
-
-        public Builder setText(String text) {
-            this.text = text;
-            return this;
-        }
-
         public Builder setBold(boolean bold) {
             this.bold = bold;
             return this;
+        }
+
+        public boolean isItalic() {
+            return italic;
         }
 
         public Builder setItalic(boolean italic) {
@@ -77,9 +60,17 @@ public class FormattedText {
             return this;
         }
 
+        public boolean isMonospaced() {
+            return monospaced;
+        }
+
         public Builder setMonospaced(boolean monospaced) {
             this.monospaced = monospaced;
             return this;
+        }
+
+        public boolean isStroked() {
+            return stroked;
         }
 
         public Builder setStroked(boolean stroked) {
@@ -87,8 +78,17 @@ public class FormattedText {
             return this;
         }
 
+        public boolean isUnderlined() {
+            return underlined;
+        }
+
         public Builder setUnderlined(boolean underlined) {
             this.underlined = underlined;
+            return this;
+        }
+
+        public Builder setText(String text) {
+            this.text = text;
             return this;
         }
 

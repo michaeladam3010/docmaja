@@ -8,20 +8,17 @@ import java.util.ArrayDeque;
 
 public class Parser {
     Document document;
-
-    public ArrayDeque<Error> errors() {
-        return errors;
-    }
-
     ArrayDeque<Error> errors = new ArrayDeque<>();
-
     CommentParser commentParser = new CommentParser();
     HeadlineParser headlineParser = new HeadlineParser();
     ListParser listParser = new ListParser();
     PluginParser pluginParser;
     ContentParser contentParser = new ContentParser();
-
     public Parser() {
+    }
+
+    public ArrayDeque<Error> errors() {
+        return errors;
     }
 
     public void parse(ISourceProvider sourceProvider, String fileName) throws IOException {
@@ -35,20 +32,20 @@ public class Parser {
 
         ISource.Window window = source.begin();
 
-        while( !window.here().isEof() ) {
-            while( window.here().isNewLine() )
+        while (!window.here().isEof()) {
+            while (window.here().isNewLine())
                 window.moveForward();
 
-            if( commentParser.tryParse(window, document) ) {
+            if (commentParser.tryParse(window, document)) {
                 errors.addAll(commentParser.errors());
                 continue;
-            } else if( headlineParser.tryParse(window, document) ) {
+            } else if (headlineParser.tryParse(window, document)) {
                 errors.addAll(headlineParser.errors());
                 continue;
-            } else if( listParser.tryParse(window, document) ) {
+            } else if (listParser.tryParse(window, document)) {
                 errors.addAll(listParser.errors());
                 continue;
-            } else if( pluginParser.tryParse(window, document) ) {
+            } else if (pluginParser.tryParse(window, document)) {
                 errors.addAll(pluginParser.errors());
                 continue;
             }

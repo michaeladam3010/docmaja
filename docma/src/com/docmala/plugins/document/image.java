@@ -1,13 +1,17 @@
 package com.docmala.plugins.document;
 
 import com.docmala.Error;
-import com.docmala.parser.*;
+import com.docmala.parser.DataBlock;
+import com.docmala.parser.Document;
+import com.docmala.parser.ISourceProvider;
+import com.docmala.parser.Parameter;
+import com.docmala.parser.blocks.Image;
 import com.docmala.plugins.IDocumentPlugin;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
 
-public class include implements IDocumentPlugin {
+public class image implements IDocumentPlugin {
     ArrayDeque<Error> errors = new ArrayDeque<>();
 
     @Override
@@ -22,8 +26,8 @@ public class include implements IDocumentPlugin {
 
     @Override
     public void process(ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
-        Parser parser = new Parser();
         Parameter file = null;
+        Image.Builder image = new Image.Builder();
 
         for (Parameter parameter : parameters) {
             if (parameter.name().equals("file")) {
@@ -38,16 +42,13 @@ public class include implements IDocumentPlugin {
         }
 
         try {
-            parser.parse(sourceProvider, file.value());
-            for (Block documentBlock : parser.document().content()) {
-                document.append(documentBlock);
-            }
+            image.setData(sourceProvider.getBinary(file.value()));
         } catch (IOException e) {
             errors.addLast(new Error(file.position(), "Unable to open file: '" + file.value() + "'."));
         }
 
-        errors.addAll(parser.errors());
-        return;
+        image.setFileType(file.value().substring(0, file.value().lastIndexOf('.')));
+        document.append(image.build());
     }
 
 }

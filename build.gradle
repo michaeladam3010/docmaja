@@ -1,0 +1,17 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'antlr'
+
+repositories {
+//    maven { url "http://maven.springframework.org/release" }
+//    maven { url "http://maven.restlet.org" }
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.scilab.forge:jlatexmath:1.0.6'
+    antlr "org.antlr:antlr4:4.7"
+}
+
+sourceSets.main.java.srcDirs = ['docma/src']
+//mainClassName = "com.docma.Main"

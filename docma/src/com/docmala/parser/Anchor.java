@@ -9,7 +9,7 @@ public final class Anchor {
         name = other.name;
     }
 
-    public Anchor(ISource.Position position, String name ) {
+    public Anchor(ISource.Position position, String name) {
         this.position = position;
         this.name = name;
     }
