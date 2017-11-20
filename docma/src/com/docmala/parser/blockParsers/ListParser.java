@@ -1,8 +1,10 @@
 package com.docmala.parser.blockParsers;
 
 import com.docmala.Error;
-import com.docmala.parser.*;
-import com.docmala.parser.blocks.Caption;
+import com.docmala.parser.Block;
+import com.docmala.parser.IBlockHolder;
+import com.docmala.parser.IBlockParser;
+import com.docmala.parser.ISource;
 import com.docmala.parser.blocks.List;
 
 import java.util.ArrayDeque;
@@ -39,10 +41,6 @@ public class ListParser implements IBlockParser, IBlockHolder {
                     if (!start.here().equals('*') && !start.here().equals('#')) {
                         start = begin;
                         list.setEnd(start.here());
-                        //TODO: find a solution without casting to Document
-                        if( ((Document)document).content().getLast() instanceof Caption) {
-                            list.setCaption((Caption)((Document)document).content().pollLast());
-                        }
                         document.append(list.build());
                         return true;
                     }

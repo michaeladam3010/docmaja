@@ -12,6 +12,7 @@ public class Parser {
     CommentParser commentParser = new CommentParser();
     HeadlineParser headlineParser = new HeadlineParser();
     ListParser listParser = new ListParser();
+    CaptionParser captionParser = new CaptionParser();
     PluginParser pluginParser;
     ContentParser contentParser = new ContentParser();
 
@@ -48,6 +49,9 @@ public class Parser {
                 continue;
             } else if (pluginParser.tryParse(window, document)) {
                 errors.addAll(pluginParser.errors());
+                continue;
+            } else if (captionParser.tryParse(window, document)) {
+                errors.addAll(captionParser.errors());
                 continue;
             }
 

@@ -2,7 +2,6 @@ package com.docmala.plugins.document;
 
 import com.docmala.Error;
 import com.docmala.parser.*;
-import com.docmala.parser.blocks.Caption;
 import com.docmala.parser.blocks.Image;
 import com.docmala.plugins.IDocumentPlugin;
 
@@ -46,9 +45,6 @@ public class image implements IDocumentPlugin {
         }
 
         image.setFileType(file.value().substring(0, file.value().lastIndexOf('.')));
-        if( document.content().getLast() instanceof Caption ) {
-            image.setCaption((Caption)document.content().pollLast());
-        }
         document.append(image.build());
     }
 

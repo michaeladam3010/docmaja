@@ -13,41 +13,65 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Html {
 
     HtmlDocument _html;
+    Map<String, Integer> captionNumbers = new HashMap<>();
 
     public HtmlDocument generate(Document document) {
         _html = new HtmlDocument();
         for (Block part : document.content()) {
-            generateBlock(part);
+            generateBlock(part, document);
         }
         return _html;
     }
 
-    void generateBlock(Block block) {
+    void generateBlock(Block block, Document document) {
         if (block == null)
             return;
 
         if (block instanceof Headline) {
-            generateHeadline((Headline) block);
+            generateHeadline((Headline) block, document);
         } else if (block instanceof List) {
-            generateList((List) block);
+            generateList((List) block, document);
         } else if (block instanceof Image) {
-            generateImage((Image) block);
+            generateImage((Image) block, document);
         } else if (block instanceof Content) {
             generateContent((Content) block);
         }
     }
 
-    private void generateImage(Image image) {
+    private void generateImage(Image image, Document document) {
         _html.body().append("<figure>");
         _html.body().append("<img src=\"data:image/");
         _html.body().append(image.fileType);
         _html.body().append(";base64,");
         _html.body().append(Base64.getEncoder().encodeToString(image.data));
         _html.body().append("\">");
+
+        if (image.caption != null) {
+            _html.body().append("<figcaption>");
+            Document.CaptionTypeData captionTypeData = document.captionTypeData().get(image.caption.type);
+            if (!captionNumbers.containsKey(image.caption.type)) {
+                captionNumbers.put(image.caption.type, 1);
+            }
+            Integer number = captionNumbers.get(image.caption.type);
+
+            captionNumbers.put(image.caption.type, number + 1);
+
+            String format = image.caption.type + "%s: ";
+            if (captionTypeData != null) {
+                format = captionTypeData.text;
+            }
+            _html.body().append(String.format(format, number.toString()));
+
+            generateBlock(image.caption.content, document);
+
+            _html.body().append("</figcaption>");
+        }
 
         _html.body().append("</figure>");
     }
@@ -102,15 +126,15 @@ public class Html {
         }
     }
 
-    void generateHeadline(Headline headline) {
+    void generateHeadline(Headline headline, Document document) {
         if (headline.level <= 6) {
             _html.body().append("<h").append(headline.level).append(">");
-            generateBlock(headline.content);
+            generateBlock(headline.content, document);
             _html.body().append("</h").append(headline.level).append(">");
         }
     }
 
-    void generateListEntries(ArrayDeque<List> entries) {
+    void generateListEntries(ArrayDeque<List> entries, Document document) {
         if (entries.isEmpty())
             return;
 
@@ -129,8 +153,8 @@ public class Html {
 
         for (List entry : entries) {
             _html.body().append("<li> ");
-            generateBlock(entry.content);
-            generateListEntries(entry.entries);
+            generateBlock(entry.content, document);
+            generateListEntries(entry.entries, document);
             _html.body().append("</li> ");
 
         }
@@ -138,8 +162,8 @@ public class Html {
         _html.body().append("</").append(type).append(">\n");
     }
 
-    void generateList(List list) {
-        generateListEntries(list.entries.getFirst().entries);
+    void generateList(List list, Document document) {
+        generateListEntries(list.entries.getFirst().entries, document);
     }
 
     static public class HtmlDocument {

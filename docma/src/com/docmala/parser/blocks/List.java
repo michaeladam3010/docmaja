@@ -2,11 +2,12 @@ package com.docmala.parser.blocks;
 
 import com.docmala.parser.Anchor;
 import com.docmala.parser.Block;
+import com.docmala.parser.ICaptionable;
 import com.docmala.parser.ISource;
 
 import java.util.ArrayDeque;
 
-public class List extends Block {
+public class List extends Block implements ICaptionable {
     public final Block content;
     public final Type type;
     public final ArrayDeque<List> entries;
@@ -20,6 +21,11 @@ public class List extends Block {
         this.caption = caption;
     }
 
+    @Override
+    public Block instanceWithCaption(Caption caption) {
+        return new List(start, end, anchors, content, type, entries, new Caption(caption, "list"));
+    }
+
     public enum Type {
         Points, Numbers
     }
@@ -31,13 +37,12 @@ public class List extends Block {
         private Block content;
         private List.Type type;
         private ArrayDeque<Builder> entries = new ArrayDeque<>();
+        private Caption caption = null;
 
         public Builder setCaption(Caption caption) {
             this.caption = caption;
             return this;
         }
-
-        private Caption caption = null;
 
         public Builder setStart(ISource.Position start) {
             this.start = start;

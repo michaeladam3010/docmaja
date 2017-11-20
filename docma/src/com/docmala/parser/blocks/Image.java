@@ -2,11 +2,12 @@ package com.docmala.parser.blocks;
 
 import com.docmala.parser.Anchor;
 import com.docmala.parser.Block;
+import com.docmala.parser.ICaptionable;
 import com.docmala.parser.ISource;
 
 import java.util.ArrayDeque;
 
-public class Image extends Block {
+public class Image extends Block implements ICaptionable {
     public final byte[] data;
     public final String fileType;
     public final Caption caption;
@@ -16,6 +17,11 @@ public class Image extends Block {
         this.data = data;
         this.fileType = fileType;
         this.caption = caption;
+    }
+
+    @Override
+    public Block instanceWithCaption(Caption caption) {
+        return new Image(start, end, anchors, data, fileType, new Caption(caption, "figure"));
     }
 
     public static class Builder {

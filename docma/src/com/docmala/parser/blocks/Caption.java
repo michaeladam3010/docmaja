@@ -16,6 +16,16 @@ public class Caption extends Block {
         this.content = content;
     }
 
+    public Caption(Caption caption, String defaultType) {
+        super(caption.start, caption.end, caption.anchors);
+        if (caption.type == null) {
+            this.type = defaultType;
+        } else {
+            this.type = caption.type;
+        }
+        this.content = caption.content;
+    }
+
     public static class Builder {
         private ISource.Position start;
         private ISource.Position end;
