@@ -3,6 +3,7 @@ package com.docmala.parser.blocks;
 import com.docmala.parser.Anchor;
 import com.docmala.parser.Block;
 import com.docmala.parser.ISource;
+import com.docmala.parser.SourcePosition;
 
 import java.util.ArrayDeque;
 
@@ -10,26 +11,26 @@ public class Headline extends Block {
     public final int level;
     public final Block content;
 
-    public Headline(ISource.Position start, ISource.Position end, ArrayDeque<Anchor> anchors, int level, Block content) {
+    public Headline(SourcePosition start, SourcePosition end, ArrayDeque<Anchor> anchors, int level, Block content) {
         super(start, end, anchors);
         this.level = level;
         this.content = content;
     }
 
     public static class Builder {
-        private ISource.Position start;
-        private ISource.Position end;
+        private SourcePosition start;
+        private SourcePosition end;
         private ArrayDeque<Anchor> anchors;
         private int level = 0;
         private Block content;
 
-        public Builder setStart(ISource.Position start) {
-            this.start = start;
+        public Builder setStart(SourcePosition start) {
+            this.start = new SourcePosition(start);
             return this;
         }
 
-        public Builder setEnd(ISource.Position end) {
-            this.end = end;
+        public Builder setEnd(SourcePosition end) {
+            this.end = new SourcePosition(end);
             return this;
         }
 

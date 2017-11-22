@@ -37,3 +37,14 @@ test //italic// __**bold underline**__ ''mono'' --stroked--
 [include, file=included.docma]
 
 textt
+
+[plantuml]
+----
+  interface Interface
+  class Alice
+  class Bob
+
+  Alice -up-> Interface
+  Bob -up-> Interface
+  Alice -* Bob
+----

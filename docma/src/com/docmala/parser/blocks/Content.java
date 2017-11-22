@@ -1,9 +1,6 @@
 package com.docmala.parser.blocks;
 
-import com.docmala.parser.Anchor;
-import com.docmala.parser.Block;
-import com.docmala.parser.FormattedText;
-import com.docmala.parser.ISource;
+import com.docmala.parser.*;
 
 import java.util.ArrayDeque;
 
@@ -11,7 +8,7 @@ public class Content extends Block {
 
     final ArrayDeque<FormattedText> content;
 
-    public Content(ISource.Position start, ISource.Position end, ArrayDeque<Anchor> anchors, ArrayDeque<FormattedText> content) {
+    public Content(SourcePosition start, SourcePosition end, ArrayDeque<Anchor> anchors, ArrayDeque<FormattedText> content) {
         super(start, end, anchors);
         this.content = content;
     }
@@ -21,18 +18,18 @@ public class Content extends Block {
     }
 
     public static class Builder {
-        private ISource.Position start;
-        private ISource.Position end;
+        private SourcePosition start;
+        private SourcePosition end;
         private ArrayDeque<Anchor> anchors = new ArrayDeque<>();
         private ArrayDeque<FormattedText> content = new ArrayDeque<>();
 
-        public Builder setStart(ISource.Position start) {
-            this.start = start;
+        public Builder setStart(SourcePosition start) {
+            this.start = new SourcePosition(start);
             return this;
         }
 
-        public Builder setEnd(ISource.Position end) {
-            this.end = end;
+        public Builder setEnd(SourcePosition end) {
+            this.end = new SourcePosition(end);
             return this;
         }
 

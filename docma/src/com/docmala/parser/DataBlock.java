@@ -1,19 +1,19 @@
 package com.docmala.parser;
 
 public class DataBlock {
-    public final ISource.Position position;
+    public final SourcePosition position;
     public final String data;
 
-    public DataBlock(ISource.Position position, String data) {
+    public DataBlock(SourcePosition position, String data) {
         this.position = position;
         this.data = data;
     }
 
     public static class Builder {
-        private ISource.Position position;
+        private SourcePosition position;
         private String data;
 
-        public Builder setPosition(ISource.Position position) {
+        public Builder setPosition(SourcePosition position) {
             this.position = position;
             return this;
         }

@@ -3,9 +3,9 @@ package com.docmala.parser;
 public final class Parameter {
     final String name;
     final String value;
-    final ISource.Position position;
+    final SourcePosition position;
 
-    public Parameter(String name, String value, ISource.Position position) {
+    public Parameter(String name, String value, SourcePosition position) {
         this.name = name;
         this.value = value;
         this.position = position;
@@ -19,14 +19,14 @@ public final class Parameter {
         return value;
     }
 
-    public ISource.Position position() {
+    public SourcePosition position() {
         return position;
     }
 
     public static class Builder {
         private String name;
         private String value;
-        private ISource.Position position;
+        private SourcePosition position;
 
         public Builder setName(String name) {
             this.name = name;
@@ -38,7 +38,7 @@ public final class Parameter {
             return this;
         }
 
-        public Builder setPosition(ISource.Position position) {
+        public Builder setPosition(SourcePosition position) {
             this.position = position;
             return this;
         }

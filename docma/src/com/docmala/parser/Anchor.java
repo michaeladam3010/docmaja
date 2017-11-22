@@ -1,7 +1,7 @@
 package com.docmala.parser;
 
 public final class Anchor {
-    private final ISource.Position position;
+    private final SourcePosition position;
     private final String name;
 
     public Anchor(Anchor other) {
@@ -9,7 +9,7 @@ public final class Anchor {
         name = other.name;
     }
 
-    public Anchor(ISource.Position position, String name) {
+    public Anchor(SourcePosition position, String name) {
         this.position = position;
         this.name = name;
     }

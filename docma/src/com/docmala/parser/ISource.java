@@ -3,29 +3,11 @@ package com.docmala.parser;
 public interface ISource {
     public Window begin();
 
-    abstract class Position {
-        protected int _line = 1;
-        protected int _column = 1;
-        protected String _fileName = "";
-
-        Position() {
-        }
+    abstract class Position extends SourcePosition{
 
         public abstract Position copy();
 
         public abstract char get();
-
-        public int line() {
-            return _line;
-        }
-
-        public int column() {
-            return _column;
-        }
-
-        public String fileName() {
-            return _fileName;
-        }
 
         public abstract boolean isEof();
 

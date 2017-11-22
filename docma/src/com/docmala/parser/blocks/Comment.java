@@ -3,13 +3,14 @@ package com.docmala.parser.blocks;
 import com.docmala.parser.Anchor;
 import com.docmala.parser.Block;
 import com.docmala.parser.ISource;
+import com.docmala.parser.SourcePosition;
 
 import java.util.ArrayDeque;
 
 public class Comment extends Block {
     String _comment = "";
 
-    public Comment(ISource.Position start, ISource.Position end, ArrayDeque<Anchor> anchors, String comment) {
+    public Comment(SourcePosition start, SourcePosition end, ArrayDeque<Anchor> anchors, String comment) {
         super(start, end, anchors);
         this._comment = comment;
     }
@@ -19,18 +20,18 @@ public class Comment extends Block {
     }
 
     public static class Builder {
-        private ISource.Position start;
-        private ISource.Position end;
+        private SourcePosition start;
+        private SourcePosition end;
         private ArrayDeque<Anchor> anchors;
         private String comment;
 
-        public Builder setStart(ISource.Position start) {
-            this.start = start.copy();
+        public Builder setStart(SourcePosition start) {
+            this.start = new SourcePosition(start);
             return this;
         }
 
-        public Builder setEnd(ISource.Position end) {
-            this.end = end.copy();
+        public Builder setEnd(SourcePosition end) {
+            this.end = new SourcePosition(end);
             return this;
         }
 

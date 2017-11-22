@@ -54,8 +54,7 @@ public class formula implements IDocumentPlugin {
     }
 
     @Override
-    public void process(ISource.Position start, ISource.Position end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
-        System.out.printf("%s%n", test(block.data));
+    public void process(SourcePosition start, SourcePosition end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
 
         TeXFormula latexFormula = new TeXFormula(test(block.data));
 

@@ -1,9 +1,6 @@
 package com.docmala.parser.blocks;
 
-import com.docmala.parser.Anchor;
-import com.docmala.parser.Block;
-import com.docmala.parser.ICaptionable;
-import com.docmala.parser.ISource;
+import com.docmala.parser.*;
 
 import java.util.ArrayDeque;
 
@@ -13,7 +10,7 @@ public class List extends Block implements ICaptionable {
     public final ArrayDeque<List> entries;
     public final Caption caption;
 
-    public List(ISource.Position start, ISource.Position end, ArrayDeque<Anchor> anchors, Block content, Type type, ArrayDeque<List> entries, Caption caption) {
+    public List(SourcePosition start, SourcePosition end, ArrayDeque<Anchor> anchors, Block content, Type type, ArrayDeque<List> entries, Caption caption) {
         super(start, end, anchors);
         this.content = content;
         this.type = type;
@@ -31,8 +28,8 @@ public class List extends Block implements ICaptionable {
     }
 
     public static class Builder {
-        private ISource.Position start;
-        private ISource.Position end;
+        private SourcePosition start;
+        private SourcePosition end;
         private ArrayDeque<Anchor> anchors = new ArrayDeque<>();
         private Block content;
         private List.Type type;
@@ -44,13 +41,13 @@ public class List extends Block implements ICaptionable {
             return this;
         }
 
-        public Builder setStart(ISource.Position start) {
-            this.start = start;
+        public Builder setStart(SourcePosition start) {
+            this.start = new SourcePosition(start);
             return this;
         }
 
-        public Builder setEnd(ISource.Position end) {
-            this.end = end;
+        public Builder setEnd(SourcePosition end) {
+            this.end = new SourcePosition(end);
             return this;
         }
 

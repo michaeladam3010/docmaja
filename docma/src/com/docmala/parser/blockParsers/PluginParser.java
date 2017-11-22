@@ -54,6 +54,7 @@ public class PluginParser implements IBlockParser {
                         for (int i = 0; i < endLevel; i++) {
                             block.append('-');
                         }
+                        block.append(start.here().get());
                         continue;
                     }
                 }
