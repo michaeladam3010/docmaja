@@ -5,7 +5,8 @@ public class SourcePosition {
     protected int _column = 1;
     protected String _fileName = "";
 
-    protected SourcePosition() {}
+    protected SourcePosition() {
+    }
 
     public SourcePosition(SourcePosition other) {
         _line = other.line();
@@ -16,17 +17,20 @@ public class SourcePosition {
     public int line() {
         return _line;
     }
+
     public int column() {
         return _column;
     }
+
     public String fileName() {
         return _fileName;
     }
 
-    public void addToLine( int add ) {
+    public void addToLine(int add) {
         _line += add;
     }
-    public void addToColumn( int add ) {
+
+    public void addToColumn(int add) {
         _column += add;
     }
 }

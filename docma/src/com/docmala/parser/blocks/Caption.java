@@ -2,7 +2,6 @@ package com.docmala.parser.blocks;
 
 import com.docmala.parser.Anchor;
 import com.docmala.parser.Block;
-import com.docmala.parser.ISource;
 import com.docmala.parser.SourcePosition;
 
 import java.util.ArrayDeque;
@@ -63,23 +62,4 @@ public class Caption extends Block {
             return new Caption(start, end, anchors, type, content);
         }
     }
-
-
-    /*extends Content {
-
-    @Override
-    public String indicators() {
-        return ".";
-    }
-
-    @Override
-    public Block create() {
-        return new Caption();
-    }
-
-    @Override
-    public ISource.Window doParse(ISource.Window start, Document document) {
-        start.moveForward();
-        return super.doParse(start, document);
-    }*/
 }

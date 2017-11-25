@@ -3,7 +3,7 @@ package com.docmala.parser;
 public interface ISource {
     public Window begin();
 
-    abstract class Position extends SourcePosition{
+    abstract class Position extends SourcePosition {
 
         public abstract Position copy();
 

@@ -1,6 +1,9 @@
 package com.docmala.parser.blocks;
 
-import com.docmala.parser.*;
+import com.docmala.parser.Anchor;
+import com.docmala.parser.Block;
+import com.docmala.parser.FormattedText;
+import com.docmala.parser.SourcePosition;
 
 import java.util.ArrayDeque;
 

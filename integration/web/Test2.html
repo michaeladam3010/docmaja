@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Frickl - SELFHTML-Wiki</title>
+	<style type="text/css" media="screen">
+		* {
+			box-sizing: border-box;
+		}
+		
+		html {
+			background: #cccccc;
+			font-family: Arial, Helvetica, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+		
+		body {
+			position: relative;
+			overflow: hidden;
+			margin: 0em auto;
+		}
+		
+		.page {
+			position: relative;
+			overflow: hidden;
+			height: 100vh;
+		}
+		
+		.menu {
+			width: 100%;
+			height: 3em;
+			background: grey;
+		}
+		
+		.editor {
+			padding: 0.5em 0.5em 3.5em;
+			width: 100%;
+			height: 100vh;
+			background: white;
+		}
+		
+		.classImgFileUpload {
+            width: 2.5em;
+            height: 2.5em;
+		}
+		#barChart_div, #stats_div { float:left; }
+		#fileInput{opacity:0} 
+		
+		.text_input {
+            resize: none;
+            width:100%;
+            height:100%; 
+            box-sizing: border-box;         /* For IE and modern versions of Chrome */
+            -moz-box-sizing: border-box;    /* For Firefox                          */
+            -webkit-box-sizing: border-box; /* For Safari                           */
+		}
+		
+	</style>
+	<script type="text/javascript">
+		//<![CDATA[
+        var textInput;
+        var connection;
+        var visualization;
+        var baseDirectory;
+        var jsonRPCId = 0;
+        var lastRequestId = 0;
+        var lastResultId = 0;
+        var updateRequested = false;
+        
+		function update() {
+            console.log("update");
+
+            if( lastRequestId != lastResultId ) {
+                updateRequested = true;
+                return;
+            }
+            
+            var obj = { jsonrpc : "2.0", method : "render", params : { filename: "base", data : btoa(textInput.value) }, id: jsonRPCId };
+            lastRequestId = jsonRPCId;
+            jsonRPCId++;
+            var request = JSON.stringify(obj);
+            console.log("request: " + request);
+            connection.send(request);
+		}
+		
+		function handleMessage(message) {
+            console.log("message: " + message.data);
+            var data = JSON.parse(message.data);
+            if( data.result !== undefined ) {
+                lastResultId = data.id;
+                
+                visualization.innerHTML = data.result;
+                
+                if( updateRequested ) {
+                    updateRequested = false;
+                    update();
+                }
+            }
+		}
+		
+		function loadFile() {
+            var fileName = document.getElementById("fileName").value;
+            
+            var rawFile = new XMLHttpRequest();
+          
+            rawFile.open("GET", fileName, true);
+            rawFile.onreadystatechange = function() {
+            
+                console.log("loaded file" + rawFile.responseText);
+                if (rawFile.readyState === 4) {
+                    var allText = rawFile.responseText;
+                    textInput.value = allText;
+                }
+            }
+            rawFile.send();
+		}
+        
+        window.onload = function() {
+            console.log("loaded");
+            textInput = document.getElementById('text_input'); 
+            visualization = document.getElementById('visualization');
+            
+            connection = new WebSocket('ws://localhost:47294');
+            connection.onmessage = handleMessage;
+
+            var button = document.getElementById("loadButton");
+            
+            button.onclick = loadFile;
+            
+            //fileInput.addEventListener('change', openFile, false);
+            //fileInput.onchange = openFile;
+            
+            textInput.onkeyup = update;
+            textInput.onblur = update;
+        }
+		//]]>
+
+	</script>
+</head>
+
+<body>
+	<div class="page">
+		<div class="menu">
+		File: <input id="fileName" type="text"></input>
+		<input type="button" id="loadButton" value="Load!"></input>
+		</div>
+		<div class="editor">
+            <div id="barChart_div" style="width: 50%; height: 100%;">
+                <textarea id="text_input" class="text_input"></textarea>
+            </div>
+            <div id="visualization" style="width: 50%; height: 100%; overflow-y:scroll;">bb
+            </div>
+		</div>
+	</div>
+</body>
+
+</html>

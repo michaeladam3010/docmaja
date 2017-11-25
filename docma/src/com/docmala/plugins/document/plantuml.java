@@ -45,10 +45,10 @@ public class plantuml implements IDocumentPlugin {
                 System.err.println(sys.getHigherErrorPosition());
                 for (ErrorUml er : sys.getErrorsUml()) {
                     SourcePosition position = new SourcePosition(start);
-                    position.addToLine(er.getPosition()+1);
+                    position.addToLine(er.getPosition() + 1);
                     StringBuilder error = new StringBuilder();
                     error.append(er.getError());
-                    if( er.getSuggest() != null ) {
+                    if (er.getSuggest() != null) {
                         error.append(" Did you mean: ").append(er.getSuggest().getSuggestedLine());
                     }
                     errors.push(new Error(position, error.toString()));

@@ -5,13 +5,18 @@ public class MemorySource implements ISource {
     protected String _fileName;
     protected String _memory;
 
+    public MemorySource() {}
+
+    public MemorySource(String _fileName, String _memory) {
+        this._fileName = _fileName;
+        this._memory = _memory;
+    }
+
     @Override
     public Window begin() {
         Window win = new MemoryWindow();
         return win;
     }
-
-    ;
 
     class MemoryWindow extends Window {
         MemoryPosition _previous;

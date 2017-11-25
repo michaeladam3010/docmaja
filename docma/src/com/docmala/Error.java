@@ -1,6 +1,5 @@
 package com.docmala;
 
-import com.docmala.parser.ISource;
 import com.docmala.parser.SourcePosition;
 
 public class Error {
