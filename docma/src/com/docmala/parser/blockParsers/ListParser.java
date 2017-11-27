@@ -12,7 +12,7 @@ import java.util.ArrayDeque;
 public class ListParser implements IBlockParser, IBlockHolder {
     ArrayDeque<Error> errors = new ArrayDeque<>();
     ContentParser contentParser = new ContentParser();
-    List.Builder list = new List.Builder();
+    List.Builder list;
     List.Builder subList;
 
     @Override
@@ -31,6 +31,7 @@ public class ListParser implements IBlockParser, IBlockHolder {
         char[] listIndicators = {'*', '#'};
 
         if (start.here().equals(listIndicators)) {
+            list = new List.Builder();
             list.setStart(start.here());
             while (!start.here().isEof()) {
 
