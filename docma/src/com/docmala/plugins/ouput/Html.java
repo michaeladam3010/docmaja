@@ -124,6 +124,7 @@ public class Html {
                 _html.body().append("</b>");
             }
         }
+        _html.body().append("</br>");
     }
 
     void generateHeadline(Headline headline, Document document) {

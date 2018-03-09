@@ -56,6 +56,7 @@ public class Parser {
             }
 
             contentParser.tryParse(window, document);
+            errors.addAll(contentParser.errors());
 
         }
     }

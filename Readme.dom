@@ -1,0 +1,7 @@
+ = Docma
+ 
+ == Usage
+ 
+ === Installation
+ 
+ * Ensure the ''dot'' tool is installed and in the ''PATH'' variable. Otherwise plantuml will not be working

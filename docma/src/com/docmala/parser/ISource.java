@@ -56,7 +56,7 @@ public interface ISource {
         }
 
         public boolean equals(char c1, char c2) {
-            return here().get() == c1 && next().get() == c2 && previous().get() != '\\';
+            return here().get() == c1 && next() != null && next().get() == c2 && (previous() == null || previous().get() != '\\');
         }
 
         public abstract Window copy();

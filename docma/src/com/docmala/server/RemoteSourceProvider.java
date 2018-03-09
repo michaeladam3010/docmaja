@@ -7,18 +7,27 @@ import com.docmala.parser.MemorySource;
 import java.io.IOException;
 
 public class RemoteSourceProvider implements ISourceProvider{
-    String baseFileName = "";
-    String baseContent = "";
+    final Requester requester;
+    final String basePath;
 
-    public void setBaseContent(String fileName, String base) {
-        baseFileName = fileName;
-        baseContent = base;
+    public RemoteSourceProvider(Requester requester) {
+        this.requester = requester;
+        basePath = "";
+    }
+
+    RemoteSourceProvider(Requester requester, String basePath) {
+        this.requester = requester;
+        this.basePath = basePath;
     }
 
     @Override
     public ISource get(String fileName) throws IOException {
-        if( fileName.equals(baseFileName) )
-            return new MemorySource(baseFileName, baseContent);
+        GetFileRequest.Result result = new GetFileRequest.Result();
+        requester.sendRequest(new GetFileRequest(new GetFileRequest.Params(basePath + fileName)), result);
+        result.waitForFinished();
+        if( result.content != null ) {
+            return new MemorySource(basePath + fileName, result.content);
+        }
         return null;
     }
 
@@ -29,13 +38,20 @@ public class RemoteSourceProvider implements ISourceProvider{
 
     @Override
     public ISourceProvider subProvider(String fileName) {
-        if( fileName.equals(baseFileName) )
+        String f = fileName.replace('\\', '/');
+        int i = f.lastIndexOf('/');
+        if( i == -1 ) {
             return this;
-        return null;
+        } else {
+            return new RemoteSourceProvider(requester, f.substring(0,i) + "/");
+        }
     }
 
     @Override
     public String getFileName(String fileName) {
-        return fileName;
+        //Todo: Should we handle the base path correctly and return a file name relative to the base path?
+        String f = fileName.replace('\\', '/');
+        int i = f.lastIndexOf('/');
+        return fileName.substring(i+1);
     }
 }

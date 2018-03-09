@@ -1,0 +1,11 @@
+{
+    \"Name\" : \"DocmaPreview\",
+    \"Version\" : \"0.0.1\",
+    \"CompatVersion\" : \"0.0.1\",
+    \"Vendor\" : \"MichaelAdam\",
+    \"Copyright\" : \"(C) Michael Adam\",
+    \"License\" : \"License to find\",
+    \"Description\" : \"Visualization of rendered docma documents\",
+    \"Url\" : \"\",
+    $$dependencyList
+}
