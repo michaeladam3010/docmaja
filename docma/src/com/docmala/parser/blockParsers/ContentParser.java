@@ -173,8 +173,6 @@ public class ContentParser implements IBlockParser {
             errors.addLast(new Error(start.here(), "Underlined formating (\"__\") was not closed."));
         }
 
-        start.moveForward();
-
         return errors.isEmpty();
     }
 }

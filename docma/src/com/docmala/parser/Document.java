@@ -27,7 +27,7 @@ public class Document implements IBlockHolder {
 
     @Override
     public void append(Block block) {
-        if (block instanceof ICaptionable && _content.getLast() instanceof Caption) {
+        if (block instanceof ICaptionable && !_content.isEmpty() && _content.getLast() instanceof Caption) {
             _content.add(((ICaptionable) block).instanceWithCaption((Caption) _content.pollLast()));
         } else {
             _content.addLast(block);
