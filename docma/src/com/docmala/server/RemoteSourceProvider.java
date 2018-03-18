@@ -6,7 +6,7 @@ import com.docmala.parser.MemorySource;
 
 import java.io.IOException;
 
-public class RemoteSourceProvider implements ISourceProvider{
+public class RemoteSourceProvider implements ISourceProvider {
     final Requester requester;
     final String basePath;
 
@@ -25,7 +25,12 @@ public class RemoteSourceProvider implements ISourceProvider{
         GetFileRequest.Result result = new GetFileRequest.Result();
         requester.sendRequest(new GetFileRequest(new GetFileRequest.Params(basePath + fileName)), result);
         result.waitForFinished();
-        if( result.content != null ) {
+
+        if (result.error != null) {
+            throw new IOException(result.error);
+        }
+
+        if (result.content != null) {
             return new MemorySource(basePath + fileName, result.content);
         }
         return null;
@@ -40,10 +45,10 @@ public class RemoteSourceProvider implements ISourceProvider{
     public ISourceProvider subProvider(String fileName) {
         String f = fileName.replace('\\', '/');
         int i = f.lastIndexOf('/');
-        if( i == -1 ) {
+        if (i == -1) {
             return this;
         } else {
-            return new RemoteSourceProvider(requester, f.substring(0,i) + "/");
+            return new RemoteSourceProvider(requester, f.substring(0, i) + "/");
         }
     }
 
@@ -52,6 +57,6 @@ public class RemoteSourceProvider implements ISourceProvider{
         //Todo: Should we handle the base path correctly and return a file name relative to the base path?
         String f = fileName.replace('\\', '/');
         int i = f.lastIndexOf('/');
-        return fileName.substring(i+1);
+        return fileName.substring(i + 1);
     }
 }

@@ -15,6 +15,7 @@ public class Parser {
     CaptionParser captionParser = new CaptionParser();
     PluginParser pluginParser;
     ContentParser contentParser = new ContentParser();
+    NextParagraphParser nextParagraphParser = new NextParagraphParser();
 
     public Parser() {
     }
@@ -34,12 +35,16 @@ public class Parser {
 
         ISource.Window window = source.begin();
 
+        while (window.here().isNewLine())
+            window.moveForward();
+
         while (!window.here().isEof()) {
-            while (window.here().isNewLine())
-                window.moveForward();
 
             if (commentParser.tryParse(window, document)) {
                 errors.addAll(commentParser.errors());
+                continue;
+            } else if (nextParagraphParser.tryParse(window, document)) {
+                errors.addAll(nextParagraphParser.errors());
                 continue;
             } else if (headlineParser.tryParse(window, document)) {
                 errors.addAll(headlineParser.errors());

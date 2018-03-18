@@ -46,4 +46,9 @@ public class HeadlineParser implements IBlockParser, IBlockHolder {
     public void append(Block block) {
         headline.setContent(block);
     }
+
+    @Override
+    public Block last() {
+        return null;
+    }
 }

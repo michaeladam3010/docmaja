@@ -22,6 +22,8 @@ public class include implements IDocumentPlugin {
 
     @Override
     public void process(SourcePosition start, SourcePosition end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
+        errors.clear();
+
         Parser parser = new Parser();
         Parameter file = null;
 

@@ -11,6 +11,8 @@ public interface ISource {
 
         public abstract boolean isEof();
 
+        public abstract boolean isEscaped();
+
         public boolean isWhitespace() {
             char c = get();
             return (c == ' ' || c == '\t');
@@ -56,7 +58,10 @@ public interface ISource {
         }
 
         public boolean equals(char c1, char c2) {
-            return here().get() == c1 && next() != null && next().get() == c2 && (previous() == null || previous().get() != '\\');
+            return next() != null &&
+                    here().get() == c1 && !here().isEscaped() &&
+                    next().get() == c2 && !next().isEscaped();
+            //return here().get() == c1 && next() != null && next().get() == c2 && (previous() == null || previous().get() != '\\');
         }
 
         public abstract Window copy();

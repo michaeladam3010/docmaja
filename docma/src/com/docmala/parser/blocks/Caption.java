@@ -31,7 +31,7 @@ public class Caption extends Block {
         private SourcePosition end;
         private ArrayDeque<Anchor> anchors;
         private String type = null;
-        private Block content;
+        private Block content = null;
 
         public Builder setStart(SourcePosition start) {
             this.start = new SourcePosition(start);

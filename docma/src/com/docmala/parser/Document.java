@@ -34,6 +34,15 @@ public class Document implements IBlockHolder {
         }
     }
 
+    @Override
+    public Block last() {
+        if (_content.isEmpty()) {
+            return null;
+        } else {
+            return _content.getLast();
+        }
+    }
+
     static public class CaptionTypeData {
         public String identifier;
         public String text;

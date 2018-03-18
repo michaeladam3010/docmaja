@@ -51,14 +51,14 @@ void DocmaClient::onTextMessageReceived(const QString &message)
             remoteGetFile(msg["params"]["fileName"].toString(), msg["id"].toInt());
         }
     } else if( msg["result"] != QJsonValue::Undefined ){
+        ProjectExplorer::TaskHub::clearTasks(DocmaPreview::Constants::TASK_ID);
         QJsonValue result = msg["result"];
         if( result["head"] != QJsonValue::Undefined && result["body"] != QJsonValue::Undefined ) {
             emit documentRendered(result["head"].toString(), result["body"].toString());
         }
-    } else if( msg["error"] != QJsonValue::Undefined ){
-        if( msg["error"] != QJsonValue::Undefined && msg["error"]["code"].toInt() == -231 ) {
+        if( result["errors"] != QJsonValue::Undefined ){
             ProjectExplorer::TaskHub::clearTasks(DocmaPreview::Constants::TASK_ID);
-            auto errors = msg["error"]["data"].toArray();
+            auto errors = result["errors"].toArray();
             for( int i = 0; i < errors.size(); i++ ) {
                 const QJsonValue error = errors[i];
                 ProjectExplorer::TaskHub::addTask(ProjectExplorer::Task(
@@ -79,17 +79,41 @@ void DocmaClient::onConnected()
 
 void DocmaClient::onDisconnected()
 {
-    m_webSocket.open(QUrl("ws://localhost:47294"));
+    //m_webSocket.open(QUrl("ws://localhost:47294"));
 }
 
 void DocmaClient::remoteGetFile(const QString &fileName, int resultId)
 {
     QByteArray fileContent;
+    bool fileWasOpen {false};
 
     for( const auto &doc : Core::DocumentModel::openedDocuments() ) {
         QString docFileName = doc->filePath().fileName(-1);
         if( fileName == docFileName ) {
             fileContent = doc->contents();
+            fileWasOpen = true;
+            break;
+        }
+    }
+
+    if( !fileWasOpen ) {
+        QFile file(fileName);
+        if( file.open(QFile::ReadOnly) ) {
+            fileContent = file.readAll();
+        } else {
+            QJsonObject obj {
+                { "jsonrpc", "2.0" },
+                { "error",
+                    QJsonObject {
+                        { "code", -242 },
+                        { "message", "File not found"}
+                    }
+                },
+                {"id", resultId}
+            };
+            QString msg = QString::fromLatin1(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+            m_webSocket.sendTextMessage(msg);
+            return;
         }
     }
 
@@ -104,5 +128,6 @@ void DocmaClient::remoteGetFile(const QString &fileName, int resultId)
     };
 
     QString msg = QString::fromLatin1(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+    qDebug() << "Sending: " << msg;
     m_webSocket.sendTextMessage(msg);
 }

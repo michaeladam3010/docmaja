@@ -22,6 +22,11 @@ public class ListParser implements IBlockParser, IBlockHolder {
     }
 
     @Override
+    public Block last() {
+        return null;
+    }
+
+    @Override
     public ArrayDeque<Error> errors() {
         return errors;
     }

@@ -98,13 +98,13 @@ public class ContentParser implements IBlockParser {
     void parseFormattedText(ISource.Window start) {
         StringBuilder text = new StringBuilder();
         while (!start.here().isBlockEnd() && !isLinkStart(start) && !isAnchorStart(start)) {
-            if (start.equals('*', '*') ||
-                    start.equals('/', '/') ||
-                    start.equals('\'', '\'') ||
-                    start.equals('-', '-') ||
-                    start.equals('_', '_')) {
+            if (!start.here().isEscaped() && !start.next().isEscaped() && (
+                    start.equals('*', '*') ||
+                            start.equals('/', '/') ||
+                            start.equals('\'', '\'') ||
+                            start.equals('-', '-') ||
+                            start.equals('_', '_'))) {
                 if (text.length() != 0) {
-
                     content.addContent(formattedText.setText(text.toString()).build());
                     text.setLength(0);
                 }
@@ -153,6 +153,7 @@ public class ContentParser implements IBlockParser {
             }
             parseFormattedText(start);
         }
+        start.moveForward();
         content.setEnd(start.here());
         document.append(content.build());
 

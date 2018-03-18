@@ -9,15 +9,15 @@ import java.net.InetSocketAddress;
 
 public class ServerMain {
     public static void main(String[] args) throws IOException {
-        Server server = new Server( new InetSocketAddress(47294));
+        Server server = new Server(new InetSocketAddress(47294));
         server.setReuseAddr(true);
         server.start();
-        System.out.println( "Docma server started on port: " + server.getPort() );
+        System.out.println("Docma server started on port: " + server.getPort());
 
-        BufferedReader sysin = new BufferedReader( new InputStreamReader( System.in ) );
-        while ( true ) {
+        BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in));
+        while (true) {
             String in = sysin.readLine();
-            if( in.equals( "exit" ) ) {
+            if (in.equals("exit")) {
                 break;
             }
         }

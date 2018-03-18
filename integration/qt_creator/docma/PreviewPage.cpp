@@ -1,5 +1,6 @@
 #include "PreviewPage.h"
 #include <QWebSocket>
+#include <QTextStream>
 
 namespace DocmaPreview {
 namespace Internal {
@@ -54,9 +55,11 @@ void PreviewPage::updateContent(const QString &head, const QString &body)
                     "    }" "\n"
                     "    var updateText = function(message) {" "\n"
                     "      placeholder.innerHTML = message.data;" "\n"
-                    "      var blocks = placeholder.querySelectorAll('pre code');" "\n"
-                    "      var ArrayProto = [];" "\n"
-                    "      ArrayProto.forEach.call(blocks, hljs.highlightBlock);" "\n"
+                    "      if( typeof(hljs) !== 'undefined' ) {" "\n"
+                    "        var blocks = placeholder.querySelectorAll('pre code');" "\n"
+                    "        var ArrayProto = [];" "\n"
+                    "        ArrayProto.forEach.call(blocks, hljs.highlightBlock);" "\n"
+                    "      }" "\n"
                     "      highlightLine(lastLine);" "\n"
                     "    }" "\n"
                     "    var webSocket = new WebSocket(\"ws://localhost:"+ QString::number(_webSocketServer.serverPort())+"\");" "\n"
@@ -92,6 +95,12 @@ void PreviewPage::update()
     if( _clientConnection ) {
         _clientConnection->sendTextMessage(_currentContent);
     }
+}
+
+void PreviewPage::javaScriptConsoleMessage(QWebEnginePage::JavaScriptConsoleMessageLevel level, const QString &message, int lineNumber, const QString &sourceID)
+{
+    QTextStream out(stdout);
+    out << message << endl;
 }
 
 } /*Internal*/

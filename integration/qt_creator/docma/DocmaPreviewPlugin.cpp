@@ -163,7 +163,18 @@ void DocmaPreviewPlugin::updatePreview()
 
 void DocmaPreviewPlugin::updateHighlight()
 {
+    auto editor = TextEditor::BaseTextEditor::currentTextEditor();
+    if( editor ) {
+        if( _settings.highlightCurrentLine() ) {
+           _previewPage->highlightLine(editor->editorWidget()->textCursor().blockNumber()+1);
+        } else {
+            _previewPage->highlightLine(-1);
+        }
 
+        if( _settings.followCursor() ) {
+            _previewPage->scrollToLine(editor->editorWidget()->textCursor().blockNumber()+1);
+        }
+    }
 }
 
 void DocmaPreviewPlugin::triggerAction()

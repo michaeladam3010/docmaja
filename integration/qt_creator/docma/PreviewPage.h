@@ -24,6 +24,10 @@ private:
     bool _skeletonPresent = false;
     QWebSocketServer _webSocketServer;
     QWebSocket* _clientConnection = nullptr;
+
+    // QWebEnginePage interface
+protected:
+    void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString &message, int lineNumber, const QString &sourceID);
 };
 
 } /*Internal*/

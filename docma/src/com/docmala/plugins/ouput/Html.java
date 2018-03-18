@@ -3,10 +3,7 @@ package com.docmala.plugins.ouput;
 import com.docmala.parser.Block;
 import com.docmala.parser.Document;
 import com.docmala.parser.FormattedText;
-import com.docmala.parser.blocks.Content;
-import com.docmala.parser.blocks.Headline;
-import com.docmala.parser.blocks.Image;
-import com.docmala.parser.blocks.List;
+import com.docmala.parser.blocks.*;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -23,10 +20,16 @@ public class Html {
 
     public HtmlDocument generate(Document document) {
         _html = new HtmlDocument();
+        _html.body().append("<p>");
         for (Block part : document.content()) {
             generateBlock(part, document);
         }
+        _html.body().append("</p>");
         return _html;
+    }
+
+    private String id(Block b) {
+        return " id=\"line_" + String.valueOf(b.start.line()) + "\"";
     }
 
     void generateBlock(Block block, Document document) {
@@ -41,6 +44,8 @@ public class Html {
             generateImage((Image) block, document);
         } else if (block instanceof Content) {
             generateContent((Content) block);
+        } else if (block instanceof NextParagraph) {
+            _html.body().append("</p>\n<p>");
         }
     }
 
@@ -89,7 +94,9 @@ public class Html {
     void generateContent(Content content) {
         if (content == null)
             return;
-
+        _html.body().append("<span");
+        _html.body().append(id(content));
+        _html.body().append(">");
         for (FormattedText text : content.content()) {
             if (text.bold) {
                 _html.body().append("<b>");
@@ -124,7 +131,8 @@ public class Html {
                 _html.body().append("</b>");
             }
         }
-        _html.body().append("</br>");
+        _html.body().append("</span>");
+        //_html.body().append("</br>");
     }
 
     void generateHeadline(Headline headline, Document document) {

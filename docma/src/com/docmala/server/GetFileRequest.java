@@ -1,10 +1,13 @@
 package com.docmala.server;
 
+import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
 
 import java.util.Base64;
 
 class GetFileRequest extends Requester.Request {
+
+    public final Params params;
 
     public GetFileRequest(Params params) {
         super("getFile");
@@ -18,16 +21,22 @@ class GetFileRequest extends Requester.Request {
             this.fileName = fileName;
         }
     }
-    public final Params params;
 
     static class Result extends Requester.SynchronizedResultHandler {
         public String content = null;
+        public String error = null;
 
         @Override
         public void finished(boolean isError, Any data) {
-            if( !isError ) {
+            if (!isError) {
                 String base64 = data.toString("data");
                 content = new String(Base64.getDecoder().decode(base64));
+            } else {
+                if (data.valueType() != ValueType.INVALID) {
+                    error = data.get("message").toString();
+                } else {
+                    error = "unknown";
+                }
             }
             setFinished();
         }

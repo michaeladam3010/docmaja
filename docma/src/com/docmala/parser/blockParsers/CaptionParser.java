@@ -58,4 +58,9 @@ public class CaptionParser implements IBlockParser, IBlockHolder {
     public void append(Block block) {
         caption.setContent(block);
     }
+
+    @Override
+    public Block last() {
+        return null;
+    }
 }

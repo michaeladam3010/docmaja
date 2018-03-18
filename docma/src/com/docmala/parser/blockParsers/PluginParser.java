@@ -73,6 +73,7 @@ public class PluginParser implements IBlockParser {
     @Override
     public boolean tryParse(ISource.Window start, IBlockHolder document) {
         if (start.here().equals('[') && !start.next().equals("[")) {
+            errors.clear();
             dataBlock = null;
             final char[] end = {']', ','};
             ISource.Position begin = start.here();

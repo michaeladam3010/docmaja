@@ -5,7 +5,8 @@ public class MemorySource implements ISource {
     protected String _fileName;
     protected String _memory;
 
-    public MemorySource() {}
+    public MemorySource() {
+    }
 
     public MemorySource(String _fileName, String _memory) {
         this._fileName = _fileName;
@@ -30,7 +31,11 @@ public class MemorySource implements ISource {
         }
 
         public MemoryWindow(MemoryPosition _previous, MemoryPosition _here, MemoryPosition _next) {
-            this._previous = new MemoryPosition(_previous);
+            if (_previous == null) {
+                this._previous = null;
+            } else {
+                this._previous = new MemoryPosition(_previous);
+            }
             this._here = new MemoryPosition(_here);
             this._next = new MemoryPosition(_next);
         }
@@ -101,28 +106,45 @@ public class MemorySource implements ISource {
             return _index >= _memory.length();
         }
 
-        public void moveForward() {
-            if (_index < 0) {
-                _index++;
-                return;
+        @Override
+        public boolean isEscaped() {
+            int pos = 1;
+            boolean escaped = false;
+            while (_index - pos >= 0 && _memory.charAt(_index - pos) == '\\') {
+                escaped = !escaped;
+                pos++;
             }
+            return escaped;
+        }
+
+        public void moveForward() {
+            if (_index >= 0) {
+                if (isEof()) {
+                    return;
+                }
+
+                if (_memory.charAt(_index) == '\r') {
+                    _index++;
+                }
+
+                if (_memory.charAt(_index) == '\n') {
+                    _line++;
+                    _column = 1;
+                } else {
+                    _column++;
+                }
+            }
+
+            _index++;
 
             if (isEof()) {
                 return;
             }
 
-            if (_memory.charAt(_index) == '\r') {
+            if (_memory.charAt(_index) == '\\') {
+                _column++;
                 _index++;
             }
-
-            if (_memory.charAt(_index) == '\n') {
-                _line++;
-                _column = 1;
-            } else {
-                _column++;
-            }
-
-            _index++;
 
             if (isEof()) {
                 return;
