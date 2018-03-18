@@ -1,0 +1,83 @@
+= Docma
+A documentation markup language
+
+== Features
+
+=== Formatted Text
+
+Text can be formatted:
+* ''\**Bold\**'' produces **Bold**
+* ''\//Italic\//'' produces //Italic//
+* '' \''Monospace\'\''' produces ''Monospace''
+* ''\--Stroked\--'' produces --Stroked--
+* ''\__Underlined\__'' produces __Underlined__
+
+If one needs a sequence of format characters in his text, these can be escaped using "\\" :
+* ''\\\**not bold\\\**'' produces \**not bold\**
+
+If the "\\" character should be printed, escape it:
+* ''\\\\'' produces \\
+
+=== Headlines
+
+Headlines are indicated by leading ''='' characters and the number of characters define the headline's level:
+* ''='' Headline level 1
+* ''=='' Headline level 2
+* ''==='' Headline level 3
+* ''===='' Headline level 4
+* ''====='' Headline level 5
+
+=== Captions
+
+=== Lists
+
+=== Comments
+
+The documentation markup can contain comments.
+Lines beginning with a ';' are treated as comments and don't produce output.
+
+=== Plugins
+
+== Client-Server Protocol
+
+When using the client server protocol a clients asks a server for rendering of a docma document.
+
+.Simple RPC sequence of a file rendering
+[plantuml]
+----
+participant Client as cl
+participant Server as sv
+
+cl -> sv : [request] render(filename)
+cl <- sv : [request] getFile(filename)
+cl -> cl : loadFileContent
+cl --> sv : [result] getFile: fileContent
+sv -> sv : render fileContent
+activate sv
+cl <-- sv : [result] render: renderedHtml
+deactivate sv
+----
+
+If the document to render needs other files for rendering (e.g. due to an ''[include]'' or ''[image]'')
+the files are requested by the server during rendering:
+
+[plantuml]
+----
+participant Client as cl
+participant Server as sv
+
+cl -> sv : [request] render(filename)
+cl <- sv : [request] getFile(filename)
+cl -> cl : loadFileContent
+cl --> sv : [result] getFile: fileContent
+sv -> sv : render fileContent
+activate sv
+    loop until all needed files are retrieved
+        cl <- sv : [request] getFile(filename)
+        cl -> cl : loadFileContent
+        cl --> sv : [result] getFile: fileContent
+    end
+    cl <-- sv : [result] render: renderedHtml
+deactivate sv
+----
+

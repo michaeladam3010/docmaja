@@ -15,11 +15,11 @@ public class Main {
         Parser p = new Parser();
 
         try {
-            ISourceProvider sourceProvider = new LocalFileSourceProvider(Paths.get("testdata/"));
-            p.parse(sourceProvider, "test.docma");
+            ISourceProvider sourceProvider = new LocalFileSourceProvider(Paths.get("/"));//testdata/"));
+            p.parse(sourceProvider, "/home/michael/tmp/test.dom");
             Html htmlOutput = new Html();
             Html.HtmlDocument doc = htmlOutput.generate(p.document());
-            doc.write("/home/michael/temp/out.html");
+            doc.write("/home/michael/tmp/out.html");
 
             for (Error error : p.errors()) {
                 System.out.printf("%s:(%d,%d):%s%n", error.position().fileName(), error.position().line(), error.position().column(), error.message());

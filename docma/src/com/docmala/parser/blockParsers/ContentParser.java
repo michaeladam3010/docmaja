@@ -153,7 +153,6 @@ public class ContentParser implements IBlockParser {
             }
             parseFormattedText(start);
         }
-        start.moveForward();
         content.setEnd(start.here());
         document.append(content.build());
 
@@ -173,6 +172,8 @@ public class ContentParser implements IBlockParser {
         if (formattedText.isUnderlined()) {
             errors.addLast(new Error(start.here(), "Underlined formating (\"__\") was not closed."));
         }
+
+        start.moveForward();
 
         return errors.isEmpty();
     }
