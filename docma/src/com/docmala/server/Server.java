@@ -129,7 +129,7 @@ public class Server extends WebSocketServer {
         public final Result result;
         public final int id;
         public RenderResult(com.docmala.plugins.ouput.Html.HtmlDocument html, ArrayDeque<RenderError> errors, int id) {
-            this.result = new Result(html.head(), html.body().toString(), errors);
+            this.result = new Result(html.head().toString(), html.body().toString(), errors);
             this.id = id;
         }
 

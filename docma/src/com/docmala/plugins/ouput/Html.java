@@ -5,21 +5,43 @@ import com.docmala.parser.Document;
 import com.docmala.parser.FormattedText;
 import com.docmala.parser.blocks.*;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayDeque;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Html {
 
     HtmlDocument _html;
     Map<String, Integer> captionNumbers = new HashMap<>();
+    String _css;
+    String _js;
+
+    public String getResourceFileAsString(String resourceFileName) {
+        InputStream is = getClass().getClassLoader().getResourceAsStream(resourceFileName);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        return reader.lines().collect(Collectors.joining("\n"));
+    }
+
+    public Html() {
+        _css = getResourceFileAsString("codeHighlight.css");
+        _js = getResourceFileAsString("codeHighlight.js");
+        _js = _js.replaceAll("<script", "&lt;script").replaceAll("</script", "&lt;/script");
+    }
 
     public HtmlDocument generate(Document document) {
         _html = new HtmlDocument();
+        _html.head().append("<style>\n");
+        _html.head().append(_css);
+        _html.head().append("\n</style>\n");
+
+        _html.head().append("<script>\n");
+        _html.head().append(_js);
+        _html.head().append("\n</script>\n");
+        _html.head().append("\n<script>hljs.initHighlightingOnLoad();</script>\n");
+
         _html.body().append("<p>");
         for (Block part : document.content()) {
             generateBlock(part, document);
@@ -44,9 +66,35 @@ public class Html {
             generateImage((Image) block, document);
         } else if (block instanceof Content) {
             generateContent((Content) block);
+        } else if (block instanceof Code) {
+            generateCode((Code) block, document);
         } else if (block instanceof NextParagraph) {
             _html.body().append("</p>\n<p>");
         }
+    }
+
+    private void generateCaption(Caption caption, Document document) {
+        if (caption != null) {
+            _html.body().append("<figcaption>");
+            Document.CaptionTypeData captionTypeData = document.captionTypeData().get(caption.type);
+            if (!captionNumbers.containsKey(caption.type)) {
+                captionNumbers.put(caption.type, 1);
+            }
+            Integer number = captionNumbers.get(caption.type);
+
+            captionNumbers.put(caption.type, number + 1);
+
+            String format = caption.type + " %s: ";
+            if (captionTypeData != null) {
+                format = captionTypeData.text;
+            }
+            _html.body().append(String.format(format, number.toString()));
+
+            generateBlock(caption.content, document);
+
+            _html.body().append("</figcaption>");
+        }
+
     }
 
     private void generateImage(Image image, Document document) {
@@ -57,26 +105,7 @@ public class Html {
         _html.body().append(Base64.getEncoder().encodeToString(image.data));
         _html.body().append("\">");
 
-        if (image.caption != null) {
-            _html.body().append("<figcaption>");
-            Document.CaptionTypeData captionTypeData = document.captionTypeData().get(image.caption.type);
-            if (!captionNumbers.containsKey(image.caption.type)) {
-                captionNumbers.put(image.caption.type, 1);
-            }
-            Integer number = captionNumbers.get(image.caption.type);
-
-            captionNumbers.put(image.caption.type, number + 1);
-
-            String format = image.caption.type + "%s: ";
-            if (captionTypeData != null) {
-                format = captionTypeData.text;
-            }
-            _html.body().append(String.format(format, number.toString()));
-
-            generateBlock(image.caption.content, document);
-
-            _html.body().append("</figcaption>");
-        }
+        generateCaption(image.caption, document);
 
         _html.body().append("</figure>");
     }
@@ -143,6 +172,21 @@ public class Html {
         }
     }
 
+    void generateCode(Code code, Document document) {
+
+        _html.body().append("<figure>");
+        if (!code.type.isEmpty()) {
+            _html.body().append("<pre").append(id(code)).append("> <code class=\"").append(code.type).append("\">\n");
+        } else {
+            _html.body().append("<pre> <code>\n");
+        }
+
+        _html.body().append(code.code);
+        _html.body().append("</code> </pre>\n");
+        generateCaption(code.caption, document);
+        _html.body().append("</figure>");
+    }
+
     void generateListEntries(ArrayDeque<List> entries, Document document) {
         if (entries.isEmpty())
             return;
@@ -176,15 +220,11 @@ public class Html {
     }
 
     static public class HtmlDocument {
-        String _head = "";
+        StringBuffer _head = new StringBuffer();
         StringBuffer _body = new StringBuffer();
 
-        public String head() {
+        public StringBuffer head() {
             return _head;
-        }
-
-        public void setHead(String head) {
-            this._head = head;
         }
 
         public StringBuffer body() {
@@ -197,7 +237,7 @@ public class Html {
             writer.write("<!doctype html>\n");
             writer.write("<html>\n");
             writer.write("<head>\n");
-            writer.write(_head);
+            writer.write(_head.toString());
             writer.write("\n");
             writer.write("</head>\n");
 

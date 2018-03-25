@@ -21,7 +21,7 @@ public class Image extends Block implements ICaptionable {
 
     @Override
     public Block instanceWithCaption(Caption caption) {
-        return new Image(start, end, anchors, data, fileType, new Caption(caption, "figure"));
+        return new Image(start, end, anchors, data, fileType, new Caption(caption, "Figure"));
     }
 
     public static class Builder {
