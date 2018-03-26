@@ -33,6 +33,7 @@ public class CommentParser implements IBlockParser {
             builder.setEnd(start.here());
             builder.setComment(comment.toString());
             document.append(builder.build());
+            start.moveForward();
             return true;
         }
         return false;

@@ -21,7 +21,7 @@ public class Code extends Block implements ICaptionable {
 
     @Override
     public Block instanceWithCaption(Caption caption) {
-        return new Code(start, end, anchors, code, type, new Caption(caption, "Listing"));
+        return new Code(start, end, anchors, code, type, new Caption(caption, "listing"));
     }
 
     public String code() {

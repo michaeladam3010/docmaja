@@ -69,7 +69,7 @@ public class Html {
         } else if (block instanceof Code) {
             generateCode((Code) block, document);
         } else if (block instanceof NextParagraph) {
-            _html.body().append("</p>\n<p>");
+            _html.body().append("\n<p>");
         }
     }
 
@@ -143,6 +143,7 @@ public class Html {
                 _html.body().append("<tt>");
             }
             generateEscapedText(text.text);
+            _html.body().append(" ");
 
             if (text.monospaced) {
                 _html.body().append("</tt>");
@@ -216,7 +217,11 @@ public class Html {
     }
 
     void generateList(List list, Document document) {
+        _html.body().append("<figure>");
         generateListEntries(list.entries.getFirst().entries, document);
+        generateCaption(list.caption, document);
+        _html.body().append("</figure>");
+
     }
 
     static public class HtmlDocument {
