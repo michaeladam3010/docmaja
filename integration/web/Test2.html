@@ -2,7 +2,8 @@
 <html>
 
 <head>
-	<title>Frickl - SELFHTML-Wiki</title>
+    <meta charset="UTF-8">
+	<title>DOCMA Websocket Communication Test</title>
 	<style type="text/css" media="screen">
 		* {
 			box-sizing: border-box;
@@ -57,6 +58,10 @@
 		}
 		
 	</style>
+	
+    <link rel="stylesheet" href="codeHighlight.css">
+    <script src='codeHighlight.js'></script>
+
 	<script type="text/javascript">
 		//<![CDATA[
         var textInput;
@@ -67,35 +72,59 @@
         var lastRequestId = 0;
         var lastResultId = 0;
         var updateRequested = false;
+        var firstRenderResult = true;
         
 		function update() {
             console.log("update");
 
-            if( lastRequestId != lastResultId ) {
+            /*if( lastRequestId != lastResultId ) {
                 updateRequested = true;
                 return;
-            }
+            }*/
             
-            var obj = { jsonrpc : "2.0", method : "render", params : { filename: "base", data : btoa(textInput.value) }, id: jsonRPCId };
+            var obj = { jsonrpc : "2.0", method : "render", params : { filename: "base" }, id: jsonRPCId };
             lastRequestId = jsonRPCId;
             jsonRPCId++;
             var request = JSON.stringify(obj);
-            console.log("request: " + request);
             connection.send(request);
 		}
 		
+		function colorizeCode() {
+            if( typeof(hljs) !== 'undefined' ) 
+            {
+                var blocks = visualization.querySelectorAll('pre code');
+                var ArrayProto = [];
+                ArrayProto.forEach.call(blocks, hljs.highlightBlock);
+            }
+        }
+		
 		function handleMessage(message) {
-            console.log("message: " + message.data);
             var data = JSON.parse(message.data);
             if( data.result !== undefined ) {
                 lastResultId = data.id;
+
                 
-                visualization.innerHTML = data.result;
+                visualization.innerHTML = data.result.body;
+                colorizeCode();
                 
                 if( updateRequested ) {
                     updateRequested = false;
                     update();
                 }
+            } else if( data.method !== undefined ) {
+                console.log("  Method");
+            	if( data.method === "getFile" ) {
+                    console.log("    getFile");
+            		if( data.params.fileName === "base" ) {
+                        console.log("      base");
+            			var result = JSON.stringify({ jsonrpc : "2.0", result : { data: btoa(textInput.value) }, id: data.id });
+            			connection.send(result);
+            		} else {
+                        var allText = "Included file: " + data.params.fileName;
+                        var result = JSON.stringify({ jsonrpc : "2.0", result : { data: btoa(allText) }, id: data.id });
+                        connection.send(result);
+            		}
+            	}
             }
 		}
 		
@@ -114,6 +143,8 @@
                 }
             }
             rawFile.send();
+            
+            
 		}
         
         window.onload = function() {
@@ -127,16 +158,13 @@
             var button = document.getElementById("loadButton");
             
             button.onclick = loadFile;
-            
-            //fileInput.addEventListener('change', openFile, false);
-            //fileInput.onchange = openFile;
-            
             textInput.onkeyup = update;
             textInput.onblur = update;
         }
 		//]]>
 
 	</script>
+	
 </head>
 
 <body>
@@ -146,13 +174,15 @@
 		<input type="button" id="loadButton" value="Load!"></input>
 		</div>
 		<div class="editor">
-            <div id="barChart_div" style="width: 50%; height: 100%;">
+            <div id="barChart_div" style="width: 40%; height: 100%;">
                 <textarea id="text_input" class="text_input"></textarea>
             </div>
-            <div id="visualization" style="width: 50%; height: 100%; overflow-y:scroll;">bb
+            <div id="visualization" style="width: 60%; height: 100%; overflow-y:scroll;">bb
             </div>
 		</div>
 	</div>
+    <script>hljs.initHighlightingOnLoad();</script>
+
 </body>
 
 </html>

@@ -38,6 +38,17 @@ public class RemoteSourceProvider implements ISourceProvider {
 
     @Override
     public byte[] getBinary(String fileName) throws IOException {
+        GetFileRequest.Result result = new GetFileRequest.Result();
+        requester.sendRequest(new GetFileRequest(new GetFileRequest.Params(basePath + fileName)), result);
+        result.waitForFinished();
+        if (result.error != null) {
+            throw new IOException(result.error);
+        }
+
+        if (result.content != null) {
+            return result.content.getBytes();
+        }
+
         return new byte[0];
     }
 

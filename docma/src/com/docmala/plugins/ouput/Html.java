@@ -176,10 +176,10 @@ public class Html {
     void generateCode(Code code, Document document) {
 
         _html.body().append("<figure>");
-        if (!code.type.isEmpty()) {
+        if (code.type != null && !code.type.isEmpty()) {
             _html.body().append("<pre").append(id(code)).append("> <code class=\"").append(code.type).append("\">\n");
         } else {
-            _html.body().append("<pre> <code>\n");
+            _html.body().append("<pre").append(id(code)).append("> <code>\n");
         }
 
         _html.body().append(code.code);
