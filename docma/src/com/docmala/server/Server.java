@@ -53,7 +53,7 @@ public class Server extends WebSocketServer {
                             render(conn, request);
                             break;
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -70,29 +70,34 @@ public class Server extends WebSocketServer {
 
     }
 
-    void render(WebSocket conn, Any data) throws IOException {
-        RemoteSourceProvider sourceProvider = new RemoteSourceProvider(requesters.get(conn));
-        String fileName = data.toString("params", "filename");
-        Parser p = new Parser();
-        p.parse(sourceProvider, fileName);
+    void render(WebSocket conn, Any data) {
+        RenderResult result;
+        try {
+            RemoteSourceProvider sourceProvider = new RemoteSourceProvider(requesters.get(conn));
+            String fileName = data.toString("params", "filename");
+            Parser p = new Parser();
+            p.parse(sourceProvider, fileName);
 
-        ArrayDeque<RenderError> errors = null;
-        if (!p.errors().isEmpty()) {
-            errors = new ArrayDeque<>();
-            for (Error error : p.errors()) {
-                errors.push(new RenderError(error));
+            ArrayDeque<RenderError> errors = null;
+            if (!p.errors().isEmpty()) {
+                errors = new ArrayDeque<>();
+                for (Error error : p.errors()) {
+                    errors.push(new RenderError(error));
+                }
             }
 
-//            JsonRpcError error = new JsonRpcError(errors);
-//            String serialize = JsonStream.serialize(error);
-//            System.out.printf("Sending rendering errors %s\n", serialize);
-//            conn.send(serialize);
+            Html htmlOutput = new Html();
+            Html.HtmlDocument doc = htmlOutput.generate(p.document());
+
+            result = new RenderResult(doc, errors, data.toInt("id"));
+        } catch (Exception e) {
+            Html.HtmlDocument doc = new Html.HtmlDocument();
+            doc.body().append("<h1>Exception occured:").append(e.toString()).append("</h1>");
+            for(StackTraceElement element : e.getStackTrace() ) {
+                doc.body().append(element.toString()).append("</br>");
+            }
+            result = new RenderResult(doc, new ArrayDeque<>(), data.toInt("id"));
         }
-
-        Html htmlOutput = new Html();
-        Html.HtmlDocument doc = htmlOutput.generate(p.document());
-
-        RenderResult result = new RenderResult(doc, errors, data.toInt("id"));
         String serialize = JsonStream.serialize(result);
         System.out.printf("Sending rendering result %s\n", serialize);
         conn.send(serialize);
