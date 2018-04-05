@@ -19,4 +19,8 @@ dependencies {
 }
 
 sourceSets.main.java.srcDirs = ['docma/src']
+
+sourceSets.main.resources.srcDirs = [ "docma/resources" ]
+sourceSets.main.resources.includes = [ "**/*" ]
+
 //mainClassName = "com.docma.Main"
