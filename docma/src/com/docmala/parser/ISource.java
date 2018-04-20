@@ -3,6 +3,40 @@ package com.docmala.parser;
 public interface ISource {
     public Window begin();
 
+    static String getExtension(String fileName) {
+        int startIndex = fileName.lastIndexOf(".");
+        if( startIndex > 0 ) {
+            int endIndex = fileName.lastIndexOf(":");
+            if( endIndex > 0 ) {
+                return fileName.substring(startIndex, endIndex);
+            }
+            return fileName.substring(startIndex);
+        }
+        return "";
+    }
+    static String getLabel(String fileName) {
+        int startIndex = fileName.lastIndexOf(".");
+        if( startIndex > 0 ) {
+            int endIndex = fileName.lastIndexOf(":");
+            if( endIndex > 0 ) {
+                return fileName.substring(endIndex+1);
+            }
+        }
+        return "";
+    }
+
+    static String getFileName(String fileName) {
+        int startIndex = fileName.lastIndexOf(".");
+        if( startIndex > 0 ) {
+            int endIndex = fileName.lastIndexOf(":");
+            if( endIndex > 0 ) {
+                return fileName.substring(0, endIndex);
+            }
+            return fileName;
+        }
+        return "";
+    }
+
     abstract class Position extends SourcePosition {
 
         public abstract Position copy();

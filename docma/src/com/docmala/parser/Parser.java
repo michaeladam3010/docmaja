@@ -25,13 +25,16 @@ public class Parser {
     }
 
     public void parse(ISourceProvider sourceProvider, String fileName) throws IOException {
-        document = new Document();
-
         ISourceProvider thisSourceProvider = sourceProvider.subProvider(fileName);
         String thisFileName = sourceProvider.getFileName(fileName);
         ISource source = thisSourceProvider.get(thisFileName);
+        parse(source, thisSourceProvider);
+    }
 
-        pluginParser = new PluginParser(thisSourceProvider);
+    public void parse(ISource source, ISourceProvider sourceProvider) throws IOException {
+        document = new Document();
+
+        pluginParser = new PluginParser(sourceProvider);
 
         ISource.Window window = source.begin();
 

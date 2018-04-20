@@ -8,8 +8,8 @@ import java.nio.file.Paths;
 public class FileSource extends MemorySource {
     public FileSource(String fileName, Charset encoding)
             throws IOException {
-        _fileName = fileName;
-        byte[] encoded = Files.readAllBytes(Paths.get(fileName));
-        _memory = new String(encoded, encoding);
+        byte[] encoded = Files.readAllBytes(Paths.get(ISource.getFileName(fileName)));
+        String memory = new String(encoded, encoding);
+        init(fileName, memory);
     }
 }

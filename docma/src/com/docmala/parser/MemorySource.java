@@ -1,16 +1,33 @@
 package com.docmala.parser;
 
+import com.docmala.parser.sourceCodeHandler.SourceCodeHandlerFactory;
+
+import java.io.IOException;
+
 public class MemorySource implements ISource {
 
-    protected String _fileName;
-    protected String _memory;
+    private String _fileName;
+    private String _fileExtension = "";
+    private String _fileLabel = "";
+    private String _memory;
+    ISourceCodeHandler _sourceCodeHandler;
 
     public MemorySource() {
     }
 
-    public MemorySource(String _fileName, String _memory) {
-        this._fileName = _fileName;
-        this._memory = _memory;
+    public MemorySource(String fileName, String memory) {
+        init( fileName, memory);
+    }
+
+    public void init(String fileName, String memory) {
+        this._memory = memory;
+
+        _fileExtension = ISource.getExtension(fileName);
+        _fileLabel = ISource.getLabel(fileName);
+        _fileName = ISource.getFileName(fileName);
+
+        _sourceCodeHandler = SourceCodeHandlerFactory.create(_fileExtension);
+        _sourceCodeHandler.init(_fileLabel, memory);
     }
 
     @Override
@@ -118,28 +135,31 @@ public class MemorySource implements ISource {
         }
 
         public void moveForward() {
-            if (_index >= 0) {
+            do {
+                if (_index >= 0) {
+                    if (isEof()) {
+                        return;
+                    }
+
+                    if (_memory.charAt(_index) == '\r') {
+                        _index++;
+                    }
+
+                    if (_memory.charAt(_index) == '\n') {
+                        _line++;
+                        _column = 1;
+                    } else {
+                        _column++;
+                    }
+                }
+
+                _index++;
+
+
                 if (isEof()) {
                     return;
                 }
-
-                if (_memory.charAt(_index) == '\r') {
-                    _index++;
-                }
-
-                if (_memory.charAt(_index) == '\n') {
-                    _line++;
-                    _column = 1;
-                } else {
-                    _column++;
-                }
-            }
-
-            _index++;
-
-            if (isEof()) {
-                return;
-            }
+            } while(!_sourceCodeHandler.isPartOfDocumentation(_index, _memory) );
 
             if (_memory.charAt(_index) == '\\') {
                 _column++;
