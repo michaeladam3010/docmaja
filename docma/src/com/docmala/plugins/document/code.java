@@ -3,10 +3,8 @@ package com.docmala.plugins.document;
 import com.docmala.Error;
 import com.docmala.parser.*;
 import com.docmala.parser.blocks.Code;
-import com.docmala.parser.blocks.Image;
 import com.docmala.plugins.IDocumentPlugin;
 
-import java.io.IOException;
 import java.util.ArrayDeque;
 
 public class code implements IDocumentPlugin {

@@ -16,6 +16,7 @@ public class Parser {
     PluginParser pluginParser;
     ContentParser contentParser = new ContentParser();
     NextParagraphParser nextParagraphParser = new NextParagraphParser();
+    MetaDataParser metaDataParser = new MetaDataParser();
 
     public Parser() {
     }
@@ -60,6 +61,9 @@ public class Parser {
                 continue;
             } else if (captionParser.tryParse(window, document)) {
                 errors.addAll(captionParser.errors());
+                continue;
+            } else if (metaDataParser.tryParse(window, document)) {
+                errors.addAll(metaDataParser.errors());
                 continue;
             }
 

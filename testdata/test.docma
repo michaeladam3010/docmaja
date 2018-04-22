@@ -1,9 +1,8 @@
-; mltc ...
-  line 2
 ; test comment 
 ; ...
-    
 ; ...
+
+{authors append Adam, Michael}
 
 = H1
 

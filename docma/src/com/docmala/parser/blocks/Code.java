@@ -55,6 +55,7 @@ public class Code extends Block implements ICaptionable {
             this.code = code;
             return this;
         }
+
         public Builder setType(String type) {
             this.type = type;
             return this;

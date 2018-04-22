@@ -11,7 +11,7 @@ import java.util.TreeMap;
  * Docma comments must follow the style: /*docma or /*docma:part
  * Users can parse docma comments from files using filename.ext or filename.ext:part as filename
  */
-public class CStyleHandler implements ISourceCodeHandler{
+public class CStyleHandler implements ISourceCodeHandler {
     boolean isDocumentation = false;
     NavigableMap<Integer, Integer> content;
 
@@ -24,23 +24,23 @@ public class CStyleHandler implements ISourceCodeHandler{
     public void init(String label, String memory) {
         content = new TreeMap<>();
         String tag = "";
-        if( label == null || label.isEmpty() ) {
+        if (label == null || label.isEmpty()) {
             tag = "/*docma";
         } else {
-            tag = "/*docma:"+label;
+            tag = "/*docma:" + label;
         }
         int startIndex = 0;
-        while( true ) {
+        while (true) {
             startIndex = memory.indexOf(tag, startIndex);
             if (startIndex > -1) {
                 int endIndex = memory.indexOf("*/", startIndex);
                 startIndex = memory.indexOf("\n", startIndex) + 1;
-                while( startIndex < endIndex ) {
+                while (startIndex < endIndex) {
                     if (startIndex > 0) {
                         startIndex = memory.indexOf("*", startIndex) + 1;
-                        if(memory.charAt(startIndex) == '/')
+                        if (memory.charAt(startIndex) == '/')
                             break;
-                        while( memory.charAt(startIndex) == ' ' || memory.charAt(startIndex) == '\t' ) {
+                        while (memory.charAt(startIndex) == ' ' || memory.charAt(startIndex) == '\t') {
                             startIndex++;
                         }
 
@@ -66,7 +66,7 @@ public class CStyleHandler implements ISourceCodeHandler{
     @Override
     public boolean isPartOfDocumentation(int index, String memory) {
         Map.Entry<Integer, Integer> entry = content.floorEntry(index);
-        if( entry != null ) {
+        if (entry != null) {
             return index < entry.getValue();
         }
         return false;

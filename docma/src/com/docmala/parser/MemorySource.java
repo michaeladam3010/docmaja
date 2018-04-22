@@ -2,21 +2,19 @@ package com.docmala.parser;
 
 import com.docmala.parser.sourceCodeHandler.SourceCodeHandlerFactory;
 
-import java.io.IOException;
-
 public class MemorySource implements ISource {
 
+    ISourceCodeHandler _sourceCodeHandler;
     private String _fileName;
     private String _fileExtension = "";
     private String _fileLabel = "";
     private String _memory;
-    ISourceCodeHandler _sourceCodeHandler;
 
     public MemorySource() {
     }
 
     public MemorySource(String fileName, String memory) {
-        init( fileName, memory);
+        init(fileName, memory);
     }
 
     public void init(String fileName, String memory) {
@@ -159,7 +157,7 @@ public class MemorySource implements ISource {
                 if (isEof()) {
                     return;
                 }
-            } while(!_sourceCodeHandler.isPartOfDocumentation(_index, _memory) );
+            } while (!_sourceCodeHandler.isPartOfDocumentation(_index, _memory));
 
             if (_memory.charAt(_index) == '\\') {
                 _column++;

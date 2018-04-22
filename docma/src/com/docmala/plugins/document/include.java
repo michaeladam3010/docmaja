@@ -3,6 +3,7 @@ package com.docmala.plugins.document;
 import com.docmala.Error;
 import com.docmala.parser.*;
 import com.docmala.parser.blocks.Headline;
+import com.docmala.parser.blocks.MetaData;
 import com.docmala.plugins.IDocumentPlugin;
 
 import java.io.IOException;
@@ -44,11 +45,10 @@ public class include implements IDocumentPlugin {
         int lastLevel = 0;
 
         Iterator it = document.content().descendingIterator();
-        while(it.hasNext())
-        {
+        while (it.hasNext()) {
             Object next = it.next();
-            if( next instanceof Headline ) {
-                lastLevel = ((Headline)next).level;
+            if (next instanceof Headline) {
+                lastLevel = ((Headline) next).level;
                 break;
             }
         }
@@ -56,9 +56,18 @@ public class include implements IDocumentPlugin {
         try {
             parser.parse(sourceProvider, file.value());
             for (Block documentBlock : parser.document().content()) {
-                if( documentBlock instanceof Headline ) {
+                if (documentBlock instanceof Headline) {
                     Headline headline = (Headline) documentBlock;
                     document.append(new Headline(headline.start, headline.end, headline.anchors, headline.level + lastLevel, headline.content));
+                } else if (documentBlock instanceof MetaData) {
+                    MetaData meta = (MetaData)documentBlock;
+                    if( document.metadata().containsKey(meta.key) ) {
+                        MetaData metaData = document.metadata().get(meta.key);
+                        // only allow included documents to append data
+                        if(metaData.modificationType == MetaData.ModificationType.Append ) {
+                            metaData.modify(meta);
+                        }
+                    }
                 } else {
                     document.append(documentBlock);
                 }

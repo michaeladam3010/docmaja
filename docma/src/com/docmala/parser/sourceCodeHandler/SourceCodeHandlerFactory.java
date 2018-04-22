@@ -5,12 +5,12 @@ import com.docmala.parser.ISourceCodeHandler;
 import java.util.Arrays;
 
 public class SourceCodeHandlerFactory {
-    static boolean contains(String fileExtension, String [] extensions) {
+    static boolean contains(String fileExtension, String[] extensions) {
         return Arrays.asList(extensions).contains(fileExtension);
     }
 
     public static ISourceCodeHandler create(String fileExtension) {
-        if( contains( fileExtension, CStyleHandler.fileExtensions() ) ) {
+        if (contains(fileExtension, CStyleHandler.fileExtensions())) {
             return new CStyleHandler();
         }
 

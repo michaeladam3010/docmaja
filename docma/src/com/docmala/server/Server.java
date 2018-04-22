@@ -10,7 +10,6 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -21,6 +20,7 @@ import java.util.concurrent.Executors;
 public class Server extends WebSocketServer {
     Map<WebSocket, Requester> requesters = new HashMap<>();
     ExecutorService executor = Executors.newFixedThreadPool(4);
+
     public Server(InetSocketAddress address) {
         super(address);
     }
@@ -93,7 +93,7 @@ public class Server extends WebSocketServer {
         } catch (Exception e) {
             Html.HtmlDocument doc = new Html.HtmlDocument();
             doc.body().append("<h1>Exception occured:").append(e.toString()).append("</h1>");
-            for(StackTraceElement element : e.getStackTrace() ) {
+            for (StackTraceElement element : e.getStackTrace()) {
                 doc.body().append(element.toString()).append("</br>");
             }
             result = new RenderResult(doc, new ArrayDeque<>(), data.toInt("id"));
@@ -133,6 +133,7 @@ public class Server extends WebSocketServer {
         public final String jsonrpc = "2.0";
         public final Result result;
         public final int id;
+
         public RenderResult(com.docmala.plugins.ouput.Html.HtmlDocument html, ArrayDeque<RenderError> errors, int id) {
             this.result = new Result(html.head().toString(), html.body().toString(), errors);
             this.id = id;

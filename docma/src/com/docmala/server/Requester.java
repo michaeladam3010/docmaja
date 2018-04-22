@@ -72,6 +72,7 @@ public class Requester {
 
         connection.send(s);
     }
+
     public interface ResultHandler {
         void finished(boolean isError, Any data);
     }

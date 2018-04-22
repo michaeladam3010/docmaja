@@ -45,7 +45,7 @@ public class image implements IDocumentPlugin {
             String message = new String(data);
             // since the locally hosted html file is not able to open other files using javascript
             // we parse the returned message for a locally hosted indication tag and add some text instead of an image.
-            if( message.startsWith("Included file:" ) ) {
+            if (message.startsWith("Included file:")) {
                 ArrayDeque<FormattedText> content = new ArrayDeque<>();
                 content.add(new FormattedText("Included image:" + message.substring(14), false, false, false, false, false));
                 document.append(new Content(start, end, new ArrayDeque<>(), content));

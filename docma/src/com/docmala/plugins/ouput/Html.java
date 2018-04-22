@@ -19,16 +19,16 @@ public class Html {
     String _css;
     String _js;
 
-    public String getResourceFileAsString(String resourceFileName) {
-        InputStream is = getClass().getClassLoader().getResourceAsStream(resourceFileName);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        return reader.lines().collect(Collectors.joining("\n"));
-    }
-
     public Html() {
         _css = getResourceFileAsString("codeHighlight.css");
         _js = getResourceFileAsString("codeHighlight.js");
         _js = _js.replaceAll("<script", "&lt;script").replaceAll("</script", "&lt;/script");
+    }
+
+    public String getResourceFileAsString(String resourceFileName) {
+        InputStream is = getClass().getClassLoader().getResourceAsStream(resourceFileName);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        return reader.lines().collect(Collectors.joining("\n"));
     }
 
     public HtmlDocument generate(Document document) {
