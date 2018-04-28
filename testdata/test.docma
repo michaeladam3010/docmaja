@@ -1,18 +1,25 @@
-; test comment 
+; test comment
 ; ...
 ; ...
 
 {authors append Adam, Michael}
 
-[csvtable]
+[csvtable, hasHeader, hasColumnHeader]
 ----
-1, 2, 3, 4
+"1, 2, 3", 2, 3, 4
+a, b, c, d
+----
+
+[csvtable, separator=";"]
+----
+1; 2; 3; 4; 2
 a, b, c, d
 ----
 
 [csvtable, file="test.csv"]
 
 = H1
+
 
 text is here
 text with << link >> link

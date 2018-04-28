@@ -235,6 +235,9 @@ public class Html {
             String end = "";
 
             for (Table.Cell cell: row) {
+                if( cell == null ) {
+                    continue;
+                }
                 StringBuilder span = new StringBuilder();
                 if (cell.isHiddenBySpan) {
                     continue;

@@ -2,7 +2,6 @@ package com.docmala.plugins.document;
 
 import com.docmala.Error;
 import com.docmala.parser.*;
-import com.docmala.parser.blocks.Code;
 import com.docmala.parser.blocks.Content;
 import com.docmala.parser.blocks.Table;
 import com.docmala.plugins.IDocumentPlugin;
@@ -23,7 +22,7 @@ public class csvtable implements IDocumentPlugin {
         return errors;
     }
 
-    Table.Cell buildCell(String value, SourcePosition start, SourcePosition end) {
+    Table.Cell buildCell(String value, SourcePosition start, SourcePosition end, boolean isHeading) {
         ArrayDeque<Block> blocks = new ArrayDeque<>();
         Content.Builder content = new Content.Builder();
         FormattedText.Builder text = new FormattedText.Builder();
@@ -37,33 +36,46 @@ public class csvtable implements IDocumentPlugin {
 
         content.setContent(contentArray);
         blocks.addLast(content.build());
-        return new Table.Cell(blocks, 1, 1, false, false);
+        return new Table.Cell(blocks, 1, 1, isHeading, false);
     }
 
-    void parse(ISource source, Table.Builder builder) {
+    void parse(ISource source, Table.Builder builder, char separator, boolean hasHeader, boolean hasColumnHeader) {
         ISource.Window start = source.begin();
-        char separator = ',';
 
         StringBuilder value = new StringBuilder();
         ArrayDeque<ArrayDeque<Table.Cell>> lines = new ArrayDeque<>();
         ISource.Position begin = start.here().copy();
         int longestLineLength = 0;
 
+        int row = 0;
+        int col = 0;
         while (!start.here().isEof()) {
             ArrayDeque<Table.Cell> line = new ArrayDeque<>();
+            boolean isQuoted = false;
             while (!start.here().isBlockEnd()) {
-                if (start.here().equals(separator) ) {
-                    line.addLast(buildCell(value.toString(), begin, start.previous()));
+                if( start.here().equals('\"') ) {
+                    isQuoted = !isQuoted;
+                    start.moveForward();
+                    continue;
+                }
+                if (start.here().equals(separator) && !isQuoted ) {
+                    boolean isHeading = row == 0 && hasHeader || col == 0 && hasColumnHeader;
+                    line.addLast(buildCell(value.toString(), begin, start.previous(), isHeading ));
                     begin = start.next().copy();
                     value = new StringBuilder();
                     start.moveForward();
                     start.skipWhitspaces();
+                    col++;
                 } else {
                     value.append(start.here().get());
                     start.moveForward();
                 }
             }
-            line.addLast(buildCell(value.toString(), begin, start.previous()));
+            if( isQuoted ) {
+                errors.addLast(new Error(start.here(), "Quotation not closed. Missing '\"'"));
+            }
+            boolean isHeading = row == 0 && hasHeader || col == 0 && hasColumnHeader;
+            line.addLast(buildCell(value.toString(), begin, start.previous(), isHeading));
             if( line.size() > longestLineLength ) {
                 longestLineLength = line.size();
             }
@@ -72,6 +84,8 @@ public class csvtable implements IDocumentPlugin {
             start.moveForward();
             start.skipWhitspaces();
             begin = start.next().copy();
+            row++;
+            col = 0;
         }
 
         Table.Cell[][] cells = new Table.Cell[lines.size()][longestLineLength];
@@ -96,11 +110,27 @@ public class csvtable implements IDocumentPlugin {
         builder.setEnd(end);
 
         Parameter file = null;
+        Parameter hasHeader = null;
+        Parameter hasColumnHeader = null;
+        char separator = ',';
 
         for (Parameter parameter : parameters) {
             if (parameter.name().equals("file")) {
                 file = parameter;
-                break;
+            }
+            if (parameter.name().equals("hasHeader")) {
+                hasHeader = parameter;
+            }
+            if (parameter.name().equals("hasColumnHeader")) {
+                hasColumnHeader = parameter;
+            }
+            if (parameter.name().equals("separator")) {
+                char[] chars = parameter.value().toCharArray();
+                if( chars.length != 1 ) {
+                    errors.addLast( new Error(parameter.position(), "Separator has to be exactly one character."));
+                } else {
+                    separator = chars[0];
+                }
             }
         }
 
@@ -114,7 +144,7 @@ public class csvtable implements IDocumentPlugin {
 
             if( block != null ) {
             MemorySource source = new MemorySource(start.fileName(), block.data, start.line()+1);
-            parse(source, builder);
+            parse(source, builder, separator, hasHeader != null, hasColumnHeader != null);
         }
         else if( file != null ) {
 
@@ -124,7 +154,7 @@ public class csvtable implements IDocumentPlugin {
             } catch (IOException e) {
                 errors.addLast(new Error(start, "Unable to open file: " + file.value()));
             }
-            parse(source, builder);
+            parse(source, builder, separator, hasHeader != null, hasColumnHeader != null);
         }
 
         document.append(builder.build());
