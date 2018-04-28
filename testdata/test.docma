@@ -4,6 +4,14 @@
 
 {authors append Adam, Michael}
 
+[csvtable]
+----
+1, 2, 3, 4
+a, b, c, d
+----
+
+[csvtable, file="test.csv"]
+
 = H1
 
 text is here
