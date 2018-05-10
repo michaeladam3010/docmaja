@@ -86,7 +86,7 @@ public interface ISource {
 
         public abstract void moveForward();
 
-        public void skipWhitspaces() {
+        public void skipWhitespaces() {
             while (here().isWhitespace()) {
                 moveForward();
             }

@@ -24,7 +24,7 @@ public class MetaDataParser implements IBlockParser {
             builder.setStart(start.here());
 
             start.moveForward();
-            start.skipWhitspaces();
+            start.skipWhitespaces();
             StringBuilder key = new StringBuilder();
             StringBuilder method = new StringBuilder();
             StringBuilder value = new StringBuilder();
@@ -37,7 +37,7 @@ public class MetaDataParser implements IBlockParser {
                         break;
                     } else if (start.here().isWhitespace()) {
                         parsing = Parsing.Method;
-                        start.skipWhitspaces();
+                        start.skipWhitespaces();
                         continue;
                     } else {
                         key.append(start.here().get());
@@ -48,7 +48,7 @@ public class MetaDataParser implements IBlockParser {
                         break;
                     } else if (start.here().isWhitespace()) {
                         parsing = Parsing.Value;
-                        start.skipWhitspaces();
+                        start.skipWhitespaces();
                         continue;
                     } else {
                         method.append(start.here().get());

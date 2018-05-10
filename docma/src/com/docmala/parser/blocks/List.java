@@ -118,7 +118,7 @@ public class List extends Block implements ICaptionable {
             ISource.Window begin = start.copy();
             if (start.here().isNewLine()) {
                 start.moveForward();
-                start.skipWhitspaces();
+                start.skipWhitespaces();
                 if (!start.here().equals('*') && !start.here().equals('#')) {
                     return begin;
                 }

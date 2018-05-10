@@ -19,7 +19,7 @@ public class PluginParser implements IBlockParser {
     boolean parseBlock(ISource.Window start) {
         block.setLength(0);
         ISource.Window begin = start.copy();
-        start.skipWhitspaces();
+        start.skipWhitespaces();
         DataBlock.Builder dataBlockBuilder = new DataBlock.Builder();
         if (start.here().isNewLine()) {
             start.moveForward();
@@ -50,7 +50,7 @@ public class PluginParser implements IBlockParser {
                     }
 
                     if (endLevel >= level) {
-                        start.skipWhitspaces();
+                        start.skipWhitespaces();
                         dataBlockBuilder.setData(block.toString());
                         dataBlock = dataBlockBuilder.build();
                         return true;
@@ -86,7 +86,7 @@ public class PluginParser implements IBlockParser {
             ArrayDeque<Parameter> parameters = new ArrayDeque<>();
 
             while (!start.here().isBlockEnd()) {
-                start.skipWhitspaces();
+                start.skipWhitespaces();
 
                 if (start.here().equals(']')) {
                     break;

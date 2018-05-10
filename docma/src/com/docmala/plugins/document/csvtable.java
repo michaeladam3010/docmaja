@@ -64,7 +64,7 @@ public class csvtable implements IDocumentPlugin {
                     begin = start.next().copy();
                     value = new StringBuilder();
                     start.moveForward();
-                    start.skipWhitspaces();
+                    start.skipWhitespaces();
                     col++;
                 } else {
                     value.append(start.here().get());
@@ -82,7 +82,7 @@ public class csvtable implements IDocumentPlugin {
             value = new StringBuilder();
             lines.addLast(line);
             start.moveForward();
-            start.skipWhitspaces();
+            start.skipWhitespaces();
             begin = start.next().copy();
             row++;
             col = 0;

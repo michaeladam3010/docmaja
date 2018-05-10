@@ -43,7 +43,7 @@ public class ListParser implements IBlockParser, IBlockHolder {
                 ISource.Window begin = start.copy();
                 if (start.here().isNewLine()) {
                     start.moveForward();
-                    start.skipWhitspaces();
+                    start.skipWhitespaces();
                     if (!start.here().equals('*') && !start.here().equals('#')) {
                         start = begin;
                         list.setEnd(start.here());
