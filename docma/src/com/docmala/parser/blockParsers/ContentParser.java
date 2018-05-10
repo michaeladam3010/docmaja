@@ -45,9 +45,16 @@ public class ContentParser implements IBlockParser {
     }
 
     public byte[] getImageData(String imageName) {
-
-        InputStream is = getClass().getClassLoader().getResourceAsStream(imageName + ".svg");
+        InputStream is = null;
         byte[] bytes = null;
+
+        is = getClass().getClassLoader().getResourceAsStream(imageName + ".svg");
+        if( is == null ) {
+            is = getClass().getClassLoader().getResourceAsStream(imageName + ".png");
+        } else if( is == null ) {
+            is = getClass().getClassLoader().getResourceAsStream(imageName + ".jpg");
+        }
+
         try {
             bytes = is.readAllBytes();
         } catch (Exception e) {
