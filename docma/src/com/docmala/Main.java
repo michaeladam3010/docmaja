@@ -15,8 +15,9 @@ public class Main {
         Parser p = new Parser();
 
         try {
-            ISourceProvider sourceProvider = new LocalFileSourceProvider(Paths.get("/"));//testdata/"));
-            p.parse(sourceProvider, "/home/michael/tmp/test.dom");
+            ISourceProvider sourceProvider = new LocalFileSourceProvider(Paths.get("/home/michael/projects/docma/docmaja/testdata/"));///home/michael/tmp/"));//testdata/"));
+            //p.parse(sourceProvider, "/home/michael/tmp/DocmaPreviewPlugin.h:part1");
+            p.parse(sourceProvider, "test.docma");
             Html htmlOutput = new Html();
             Html.HtmlDocument doc = htmlOutput.generate(p.document());
             doc.write("/home/michael/tmp/out.html");

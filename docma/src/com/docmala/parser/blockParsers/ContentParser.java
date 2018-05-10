@@ -4,7 +4,12 @@ import com.docmala.Error;
 import com.docmala.parser.*;
 import com.docmala.parser.blocks.Content;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayDeque;
+import java.util.stream.Collectors;
 
 public class ContentParser implements IBlockParser {
     ArrayDeque<Error> errors = new ArrayDeque<>();
@@ -32,6 +37,24 @@ public class ContentParser implements IBlockParser {
         return start.equals(']', ']');
     }
 
+    boolean isImageStart(ISource.Window start) {
+        return start.here().equals(':');
+    }
+    boolean isImageEnd(ISource.Window start) {
+        return start.here().equals(':');
+    }
+
+    public byte[] getImageData(String imageName) {
+
+        InputStream is = getClass().getClassLoader().getResourceAsStream(imageName + ".svg");
+        byte[] bytes = null;
+        try {
+            bytes = is.readAllBytes();
+        } catch (Exception e) {
+        }
+        return bytes;
+    }
+
     boolean parseAnchor(ISource.Window start) {
         if (!isAnchorStart(start))
             return false;
@@ -55,6 +78,40 @@ public class ContentParser implements IBlockParser {
 
         errors.addLast(new Error(position, "Error while parsing anchor. Expected ']]' but got 'EndOfBlock' "));
         return true;
+    }
+
+    boolean parseImage(ISource.Window start) {
+        if (!isImageStart(start))
+            return false;
+
+        ISource.Window begin = start.copy();
+        ISource.Position position = start.here().copy();
+        StringBuilder text = new StringBuilder();
+        start.moveForward();
+
+        while (!start.here().isBlockEnd()) {
+            if (isImageEnd(start)) {
+                byte[] imageData = getImageData(text.toString());
+                text.append(':');
+                text.insert(0, ':');
+                formattedText.setText(text.toString());
+                start.moveForward();
+                if( imageData != null ) {
+                    content.addContent(formattedText.buildImage(imageData, "svg+xml"));
+                } else {
+                    content.addContent(formattedText.build());
+                }
+                start.moveForward();
+                return true;
+            } else if( start.here().isWhitespace() ) {
+                start.setTo(begin);
+                return false;
+            }
+            text.append(start.here().get());
+            start.moveForward();
+        }
+
+        return false;
     }
 
     boolean parseLink(ISource.Window start) {
@@ -97,7 +154,7 @@ public class ContentParser implements IBlockParser {
 
     void parseFormattedText(ISource.Window start) {
         StringBuilder text = new StringBuilder();
-        while (!start.here().isBlockEnd() && !isLinkStart(start) && !isAnchorStart(start)) {
+        while (!start.here().isBlockEnd() && !isLinkStart(start) && !isAnchorStart(start) && !isImageStart(start)) {
             if (!start.here().isEscaped() && !start.next().isEscaped() && (
                     start.equals('*', '*') ||
                             start.equals('/', '/') ||
@@ -148,7 +205,7 @@ public class ContentParser implements IBlockParser {
         formattedText = new FormattedText.Builder();
         content.setStart(start.here());
         while (!start.here().isBlockEnd()) {
-            if (parseLink(start) || parseAnchor(start)) {
+            if (parseLink(start) || parseAnchor(start) || parseImage(start)) {
                 continue;
             }
             parseFormattedText(start);

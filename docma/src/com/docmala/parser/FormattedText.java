@@ -32,6 +32,17 @@ public class FormattedText {
         }
     }
 
+    public static class Image extends FormattedText {
+        public final byte[] data;
+        public final String fileType;
+
+        public Image(String text, boolean bold, boolean italic, boolean monospaced, boolean stroked, boolean underlined, byte[] data, String fileType) {
+            super(text, bold, italic, monospaced, stroked, underlined);
+            this.data = data;
+            this.fileType = fileType;
+        }
+    }
+
     public static final class Builder {
         private String text;
         private boolean bold = false;
@@ -130,7 +141,13 @@ public class FormattedText {
         }
 
         public FormattedText.Link buildLink() {
-            return new Link(text, bold, italic, monospaced, stroked, underlined, url, type);
+            Link link = new Link(text, bold, italic, monospaced, stroked, underlined, url, type);
+            url = "";
+            return link;
+        }
+
+        public FormattedText.Image buildImage(byte[] data, String fileType) {
+            return  new Image(text, bold, italic, monospaced, stroked, underlined, data, fileType);
         }
     }
 }

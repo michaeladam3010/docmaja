@@ -130,38 +130,49 @@ public class Html {
         _html.body().append(id(content));
         _html.body().append(">");
         for (FormattedText text : content.content()) {
-            if (text.bold) {
-                _html.body().append("<b>");
-            }
-            if (text.italic) {
-                _html.body().append("<i>");
-            }
-            if (text.underlined) {
-                _html.body().append("<u>");
-            }
-            if (text.stroked) {
-                _html.body().append("<del>");
-            }
-            if (text.monospaced) {
-                _html.body().append("<tt>");
-            }
-            generateEscapedText(text.text);
-            _html.body().append(" ");
+            if( text instanceof FormattedText.Image ) {
+                FormattedText.Image image = (FormattedText.Image)text;
+                _html.body().append("<img style=\"height:1em;\" src=\"data:image/");
+                _html.body().append(image.fileType);
+                _html.body().append(";base64,");
+                _html.body().append(Base64.getEncoder().encodeToString(image.data));
+                _html.body().append("\">");
+                _html.body().append(" ");
+            } else {
 
-            if (text.monospaced) {
-                _html.body().append("</tt>");
-            }
-            if (text.stroked) {
-                _html.body().append("</del>");
-            }
-            if (text.underlined) {
-                _html.body().append("</u>");
-            }
-            if (text.italic) {
-                _html.body().append("</i>");
-            }
-            if (text.bold) {
-                _html.body().append("</b>");
+                if (text.bold) {
+                    _html.body().append("<b>");
+                }
+                if (text.italic) {
+                    _html.body().append("<i>");
+                }
+                if (text.underlined) {
+                    _html.body().append("<u>");
+                }
+                if (text.stroked) {
+                    _html.body().append("<del>");
+                }
+                if (text.monospaced) {
+                    _html.body().append("<tt>");
+                }
+                generateEscapedText(text.text);
+                _html.body().append(" ");
+
+                if (text.monospaced) {
+                    _html.body().append("</tt>");
+                }
+                if (text.stroked) {
+                    _html.body().append("</del>");
+                }
+                if (text.underlined) {
+                    _html.body().append("</u>");
+                }
+                if (text.italic) {
+                    _html.body().append("</i>");
+                }
+                if (text.bold) {
+                    _html.body().append("</b>");
+                }
             }
         }
         _html.body().append("</span>");
