@@ -90,7 +90,7 @@ public class formula implements IDocumentPlugin {
         document.append(imageBuilder.build());
     }
 
-    class ErrorListener extends BaseErrorListener {
+    static class ErrorListener extends BaseErrorListener {
 
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {

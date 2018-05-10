@@ -36,7 +36,7 @@ public interface ISource {
         return "";
     }
 
-    public Window begin();
+    Window begin();
 
     abstract class Position extends SourcePosition {
 

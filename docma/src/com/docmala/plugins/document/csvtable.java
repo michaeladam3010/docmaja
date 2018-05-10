@@ -26,7 +26,7 @@ public class csvtable implements IDocumentPlugin {
         ArrayDeque<Block> blocks = new ArrayDeque<>();
         Content.Builder content = new Content.Builder();
         FormattedText.Builder text = new FormattedText.Builder();
-        text.setText(value.toString());
+        text.setText(value);
 
         content.setStart(start);
         content.setEnd(end);
