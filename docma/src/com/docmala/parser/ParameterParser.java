@@ -18,7 +18,7 @@ public class ParameterParser {
 
     public ISource.Window parse(ISource.Window start, char[] end) {
         _errors = new ArrayDeque<>();
-        start.skipWhitspaces();
+        start.skipWhitespaces();
         ISource.Position begin = start.here();
         StringBuilder name = new StringBuilder();
         StringBuilder value = new StringBuilder();
@@ -37,7 +37,7 @@ public class ParameterParser {
 
         if (start.here().equals('=')) {
             start.moveForward();
-            start.skipWhitspaces();
+            start.skipWhitespaces();
 
             boolean searchQuotationMark = start.here().equals('"');
             boolean isQuotedParameter = searchQuotationMark;
@@ -49,7 +49,7 @@ public class ParameterParser {
                 if (searchQuotationMark && start.here().equals('"')) {
                     searchQuotationMark = false;
                     start.moveForward();
-                    start.skipWhitspaces();
+                    start.skipWhitespaces();
                     if (!start.here().equals(end)) {
                         _errors.addLast(new Error(start.here(), "Expected: " + end));
                     }

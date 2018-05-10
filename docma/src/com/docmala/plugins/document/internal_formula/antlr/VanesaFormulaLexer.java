@@ -60,7 +60,7 @@ public class VanesaFormulaLexer extends Lexer {
             "MULT", "DIV", "POW", "LODASH", "LPAREN", "RPAREN", "COMMA", "DOT"
     };
     public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
-    public static String[] modeNames = {
+    public static final String[] modeNames = {
             "DEFAULT_MODE"
     };
 

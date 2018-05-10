@@ -14,13 +14,13 @@ public class ServerMain {
         server.start();
         System.out.println("Docma server started on port: " + server.getPort());
 
-        BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in));
-        while (true) {
-            String in = sysin.readLine();
-            if (in.equals("exit")) {
-                break;
+        try(BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in))) {
+            while (true) {
+                String in = sysin.readLine();
+                if (in.equals("exit")) {
+                    break;
+                }
             }
         }
-
     }
 }

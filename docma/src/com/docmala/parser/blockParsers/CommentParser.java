@@ -23,7 +23,7 @@ public class CommentParser implements IBlockParser {
             builder.setStart(start.here());
 
             start.moveForward();
-            start.skipWhitspaces();
+            start.skipWhitespaces();
             StringBuilder comment = new StringBuilder();
 
             while (!start.here().isBlockEnd()) {

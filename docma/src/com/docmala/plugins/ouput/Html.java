@@ -19,16 +19,17 @@ public class Html {
     String _css;
     String _js;
 
-    public Html() {
+    public Html() throws IOException {
         _css = getResourceFileAsString("codeHighlight.css");
         _js = getResourceFileAsString("codeHighlight.js");
         _js = _js.replaceAll("<script", "&lt;script").replaceAll("</script", "&lt;/script");
     }
 
-    public String getResourceFileAsString(String resourceFileName) {
+    public String getResourceFileAsString(String resourceFileName) throws IOException {
         InputStream is = getClass().getClassLoader().getResourceAsStream(resourceFileName);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        return reader.lines().collect(Collectors.joining("\n"));
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            return reader.lines().collect(Collectors.joining("\n"));
+        }
     }
 
     public HtmlDocument generate(Document document) {
@@ -286,21 +287,19 @@ public class Html {
         }
 
         public void write(String fileName) throws IOException {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+            try(BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+                writer.write("<!doctype html>\n");
+                writer.write("<html>\n");
+                writer.write("<head>\n");
+                writer.write(_head.toString());
+                writer.write("\n");
+                writer.write("</head>\n");
 
-            writer.write("<!doctype html>\n");
-            writer.write("<html>\n");
-            writer.write("<head>\n");
-            writer.write(_head.toString());
-            writer.write("\n");
-            writer.write("</head>\n");
-
-            writer.write("<body>\n");
-            writer.write(_body.toString());
-            writer.write("\n");
-            writer.write("</body>\n");
-
-            writer.close();
+                writer.write("<body>\n");
+                writer.write(_body.toString());
+                writer.write("\n");
+                writer.write("</body>\n");
+            }
         }
     }
 

@@ -28,7 +28,7 @@ public class CaptionParser implements IBlockParser, IBlockHolder {
             caption = new Caption.Builder();
             caption.setStart(start.here());
 
-            start.skipWhitspaces();
+            start.skipWhitespaces();
             if (start.here().equals('[') && !start.next().equals('[')) {
                 start.moveForward();
                 StringBuilder type = new StringBuilder();

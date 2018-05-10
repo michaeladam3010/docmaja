@@ -40,7 +40,7 @@ public class ContentParser implements IBlockParser {
         String name = "";
         start.moveForward();
         start.moveForward();
-        start.skipWhitspaces();
+        start.skipWhitespaces();
 
         while (!start.here().isBlockEnd()) {
             if (isAnchorEnd(start)) {
@@ -66,7 +66,7 @@ public class ContentParser implements IBlockParser {
         String url = "";
         start.moveForward();
         start.moveForward();
-        start.skipWhitspaces();
+        start.skipWhitespaces();
 
         String[] destination = {url};
 

@@ -26,7 +26,7 @@ public class csvtable implements IDocumentPlugin {
         ArrayDeque<Block> blocks = new ArrayDeque<>();
         Content.Builder content = new Content.Builder();
         FormattedText.Builder text = new FormattedText.Builder();
-        text.setText(value.toString());
+        text.setText(value);
 
         content.setStart(start);
         content.setEnd(end);
@@ -64,7 +64,7 @@ public class csvtable implements IDocumentPlugin {
                     begin = start.next().copy();
                     value = new StringBuilder();
                     start.moveForward();
-                    start.skipWhitspaces();
+                    start.skipWhitespaces();
                     col++;
                 } else {
                     value.append(start.here().get());
@@ -82,7 +82,7 @@ public class csvtable implements IDocumentPlugin {
             value = new StringBuilder();
             lines.addLast(line);
             start.moveForward();
-            start.skipWhitspaces();
+            start.skipWhitespaces();
             begin = start.next().copy();
             row++;
             col = 0;
