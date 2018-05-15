@@ -2,6 +2,9 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'antlr'
 
+sourceCompatibility = 9
+targetCompatibility = 9
+
 repositories {
 //    maven { url "http://maven.springframework.org/release" }
 //    maven { url "http://maven.restlet.org" }

@@ -98,7 +98,12 @@ public class ContentParser implements IBlockParser {
 
         while (!start.here().isBlockEnd()) {
             if (isImageEnd(start)) {
-                byte[] imageData = getImageData(text.toString());
+                byte[] imageData;
+                if( !text.toString().contains("/") ) {
+                    imageData = getImageData("emoji/" + text.toString());
+                } else {
+                    imageData = getImageData(text.toString());
+                }
                 text.append(':');
                 text.insert(0, ':');
                 formattedText.setText(text.toString());

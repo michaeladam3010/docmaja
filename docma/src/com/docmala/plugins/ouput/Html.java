@@ -135,7 +135,7 @@ public class Html {
         for (FormattedText text : content.content()) {
             if( text instanceof FormattedText.Image ) {
                 FormattedText.Image image = (FormattedText.Image)text;
-                _htmlBody.append("<img style=\"height:1em;\" src=\"data:image/");
+                _htmlBody.append("<img style=\"height:1.2em; vertical-align:text-bottom;\" src=\"data:image/");
                 _htmlBody.append(image.fileType);
                 _htmlBody.append(";base64,");
                 _htmlBody.append(Base64.getEncoder().encodeToString(image.data));
