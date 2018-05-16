@@ -1,5 +1,6 @@
 package com.docmala.plugins.ouput;
 
+import com.docmala.parser.Anchor;
 import com.docmala.parser.Block;
 import com.docmala.parser.Document;
 import com.docmala.parser.FormattedText;
@@ -62,6 +63,8 @@ public class Html {
         if (block == null)
             return;
 
+        generateAnchors(block, document);
+
         if (block instanceof Headline) {
             generateHeadline((Headline) block, document);
         } else if (block instanceof List) {
@@ -76,6 +79,14 @@ public class Html {
             generateCode((Code) block, document);
         } else if (block instanceof NextParagraph) {
             _htmlBody.append("\n<p>");
+        }
+    }
+
+    private void generateAnchors(Block block, Document document) {
+        if( block.anchors != null ) {
+            for (Anchor anchor : block.anchors) {
+                _htmlBody.append("<a name=\"").append(anchor.name).append("\"></a>");
+            }
         }
     }
 
@@ -141,6 +152,17 @@ public class Html {
                 _htmlBody.append(Base64.getEncoder().encodeToString(image.data));
                 _htmlBody.append("\">");
                 _htmlBody.append(" ");
+            } else if( text instanceof FormattedText.Link ) {
+                FormattedText.Link link = (FormattedText.Link)text;
+                String visualText = link.text;
+                if( visualText.isEmpty() ) {
+                    visualText = link.url;
+                }
+
+                if( link.type == FormattedText.Link.Type.IntraFile ) {
+                    _htmlBody.append("<a href=\"#").append(link.url).append("\">");
+                }
+                _htmlBody.append(visualText).append("</a>");
             } else {
 
                 if (text.bold) {

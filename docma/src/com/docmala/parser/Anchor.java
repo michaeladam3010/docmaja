@@ -1,8 +1,8 @@
 package com.docmala.parser;
 
 public final class Anchor {
-    private final SourcePosition position;
-    private final String name;
+    public final SourcePosition position;
+    public final String name;
 
     public Anchor(Anchor other) {
         position = other.position;

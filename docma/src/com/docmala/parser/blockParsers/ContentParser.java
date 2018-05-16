@@ -130,21 +130,25 @@ public class ContentParser implements IBlockParser {
             return false;
 
         ISource.Position position = start.here().copy();
-        String text = "";
-        String url = "";
+        StringBuilder text = new StringBuilder();
+        StringBuilder url = new StringBuilder();
         start.moveForward();
         start.moveForward();
         start.skipWhitespaces();
 
-        String[] destination = {url};
+        StringBuilder[] destination = {url};
 
         while (!start.here().isBlockEnd()) {
             if (isLinkEnd(start)) {
+                String urlString = url.toString().trim();
 
                 formattedText.setType(FormattedText.Link.Type.IntraFile);
-                if (url.contains("://")) {
+                formattedText.setUrl(urlString);
+                formattedText.setText(text.toString());
+
+                if (urlString.contains("://")) {
                     formattedText.setType(FormattedText.Link.Type.Web);
-                } else if (url.contains(":")) {
+                } else if (urlString.contains(":")) {
                     formattedText.setType(FormattedText.Link.Type.InterFile);
                 }
                 content.addContent(formattedText.buildLink());
@@ -152,9 +156,9 @@ public class ContentParser implements IBlockParser {
                 start.moveForward();
                 return true;
             } else if (start.here().equals(',')) {
-                destination[0] = url;
+                destination[0] = text;
             } else {
-                destination[0] += start.here().get();
+                destination[0].append(start.here().get());
             }
             start.moveForward();
         }
