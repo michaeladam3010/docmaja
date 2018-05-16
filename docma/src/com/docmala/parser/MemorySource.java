@@ -90,7 +90,11 @@ public class MemorySource implements ISource {
 
         @Override
         public void setTo(Window window) {
-            _previous = new MemoryPosition((MemoryPosition) window.previous());
+            if( window.previous() == null ) {
+                _previous = null;
+            } else {
+                _previous = new MemoryPosition((MemoryPosition) window.previous());
+            }
             _here = new MemoryPosition((MemoryPosition) window.here());
             _next = new MemoryPosition((MemoryPosition) window.next());
         }

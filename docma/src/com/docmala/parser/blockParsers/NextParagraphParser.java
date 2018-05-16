@@ -21,21 +21,16 @@ public class NextParagraphParser implements IBlockParser {
         ISource.Window storedStart = start.copy();
         start.skipWhitespaces();
         if (start.here().isBlockEnd()) {
-            start.moveForward();
-            start.skipWhitespaces();
-
-            if (start.here().isBlockEnd()) {
-                if (!(document.last() instanceof NextParagraph)) {
-                    NextParagraph.Builder builder = new NextParagraph.Builder();
-                    builder.setStart(start.here());
-                    builder.setEnd(start.here());
-                    document.append(builder.build());
-                }
-                start.moveForward();
-                return true;
+            if (!(document.last() instanceof NextParagraph)) {
+                NextParagraph.Builder builder = new NextParagraph.Builder();
+                builder.setStart(start.here());
+                builder.setEnd(start.here());
+                document.append(builder.build());
             }
+            start.moveForward();
+            return true;
         }
-        start = storedStart;
+        start.setTo(storedStart);
         return false;
     }
 }

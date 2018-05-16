@@ -113,7 +113,6 @@ public class ContentParser implements IBlockParser {
                 } else {
                     content.addContent(formattedText.build());
                 }
-                start.moveForward();
                 return true;
             } else if( start.here().isWhitespace() ) {
                 start.setTo(begin);
