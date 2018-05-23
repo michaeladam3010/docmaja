@@ -2,27 +2,50 @@ package com.docmala.parser;
 
 public class FormattedText {
     public final String text;
-    public final boolean bold;
-    public final boolean italic;
-    public final boolean monospaced;
-    public final boolean stroked;
-    public final boolean underlined;
+    public final Style style;
 
-    public FormattedText(String text, boolean bold, boolean italic, boolean monospaced, boolean stroked, boolean underlined) {
+    public FormattedText(String text, Style style) {
         this.text = text;
-        this.bold = bold;
-        this.italic = italic;
-        this.monospaced = monospaced;
-        this.stroked = stroked;
-        this.underlined = underlined;
+        this.style = style;
+    }
+
+    public static class Color {
+        public final int r; ///< range 0-255
+        public final int g; ///< range 0-255
+        public final int b; ///< range 0-255
+
+        public Color() {
+            this.r = 0;
+            this.g = 0;
+            this.b = 0;
+        }
+
+        public Color(int r, int g, int b) {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+        }
+
+        public boolean isColored() {
+            return !(r == 0 && g == 0 && b == 0);
+        }
+    }
+
+    public static class Style {
+        public boolean bold = false;
+        public boolean italic = false;
+        public boolean monospaced = false;
+        public boolean stroked = false;
+        public boolean underlined = false;
+        public Color color = new Color();
     }
 
     public static class Link extends FormattedText {
         public final String url;
         public final Type type;
 
-        public Link(String text, boolean bold, boolean italic, boolean monospaced, boolean stroked, boolean underlined, String url, Type type) {
-            super(text, bold, italic, monospaced, stroked, underlined);
+        public Link(String text, String url, Type type, Style style) {
+            super(text, style);
             this.url = url;
             this.type = type;
         }
@@ -36,8 +59,8 @@ public class FormattedText {
         public final byte[] data;
         public final String fileType;
 
-        public Image(String text, boolean bold, boolean italic, boolean monospaced, boolean stroked, boolean underlined, byte[] data, String fileType) {
-            super(text, bold, italic, monospaced, stroked, underlined);
+        public Image(String text, byte[] data, String fileType, Style style) {
+            super(text, style);
             this.data = data;
             this.fileType = fileType;
         }
@@ -45,57 +68,57 @@ public class FormattedText {
 
     public static final class Builder {
         private String text;
-        private boolean bold = false;
-        private boolean italic = false;
-        private boolean monospaced = false;
-        private boolean stroked = false;
-        private boolean underlined = false;
+        private Style style = new Style();
         private String url;
         private Link.Type type;
 
         public boolean isBold() {
-            return bold;
+            return style.bold;
         }
 
         public Builder setBold(boolean bold) {
-            this.bold = bold;
+            this.style.bold = bold;
             return this;
         }
 
         public boolean isItalic() {
-            return italic;
+            return style.italic;
         }
 
         public Builder setItalic(boolean italic) {
-            this.italic = italic;
+            this.style.italic = italic;
             return this;
         }
 
         public boolean isMonospaced() {
-            return monospaced;
+            return style.monospaced;
         }
 
         public Builder setMonospaced(boolean monospaced) {
-            this.monospaced = monospaced;
+            this.style.monospaced = monospaced;
             return this;
         }
 
         public boolean isStroked() {
-            return stroked;
+            return style.stroked;
         }
 
         public Builder setStroked(boolean stroked) {
-            this.stroked = stroked;
+            this.style.stroked = stroked;
             return this;
         }
 
         public boolean isUnderlined() {
-            return underlined;
+            return style.underlined;
         }
 
         public Builder setUnderlined(boolean underlined) {
-            this.underlined = underlined;
+            this.style.underlined = underlined;
             return this;
+        }
+
+        public Color color() {
+            return this.style.color;
         }
 
         public Builder setText(String text) {
@@ -104,27 +127,32 @@ public class FormattedText {
         }
 
         public Builder toggleBold() {
-            bold = !bold;
+            style.bold = !style.bold;
             return this;
         }
 
         public Builder toggleItalic() {
-            italic = !italic;
+            style.italic = !style.italic;
             return this;
         }
 
         public Builder toggleMonospaced() {
-            monospaced = !monospaced;
+            style.monospaced = !style.monospaced;
             return this;
         }
 
         public Builder toggleStroked() {
-            stroked = !stroked;
+            style.stroked = !style.stroked;
             return this;
         }
 
         public Builder toggleUnderlined() {
-            underlined = !underlined;
+            style.underlined = !style.underlined;
+            return this;
+        }
+
+        public Builder setColor(Color color) {
+            this.style.color = color;
             return this;
         }
 
@@ -136,18 +164,22 @@ public class FormattedText {
             this.type = type;
         }
 
+        public void setStyle(Style style) {
+            this.style = style;
+        }
+
         public FormattedText build() {
-            return new FormattedText(text, bold, italic, monospaced, stroked, underlined);
+            return new FormattedText(text, style);
         }
 
         public FormattedText.Link buildLink() {
-            Link link = new Link(text, bold, italic, monospaced, stroked, underlined, url, type);
+            Link link = new Link(text, url, type, style);
             url = "";
             return link;
         }
 
         public FormattedText.Image buildImage(byte[] data, String fileType) {
-            return  new Image(text, bold, italic, monospaced, stroked, underlined, data, fileType);
+            return new Image(text, data, fileType, style);
         }
     }
 }

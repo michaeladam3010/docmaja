@@ -1,38 +1,29 @@
 package com.docmala.parser.blocks;
 
-import com.docmala.parser.Anchor;
-import com.docmala.parser.Block;
-import com.docmala.parser.ICaptionable;
-import com.docmala.parser.SourcePosition;
+import com.docmala.parser.*;
 
 import java.util.ArrayDeque;
 
-public class Code extends Block implements ICaptionable {
-    public final String code;
+public class Code extends Content implements ICaptionable {
     public final String type;
     public final Caption caption;
 
-    public Code(SourcePosition start, SourcePosition end, ArrayDeque<Anchor> anchors, String code, String type, Caption caption) {
-        super(start, end, anchors);
-        this.code = code;
+    public Code(SourcePosition start, SourcePosition end, ArrayDeque<Anchor> anchors, ArrayDeque<FormattedText> code, String type, Caption caption) {
+        super(start, end, anchors, code);
         this.type = type;
         this.caption = caption;
     }
 
     @Override
     public Block instanceWithCaption(Caption caption) {
-        return new Code(start, end, anchors, code, type, new Caption(caption, "listing"));
-    }
-
-    public String code() {
-        return code;
+        return new Code(start, end, anchors, content, type, new Caption(caption, "listing"));
     }
 
     public static class Builder {
         private SourcePosition start;
         private SourcePosition end;
         private ArrayDeque<Anchor> anchors;
-        private String code;
+        private ArrayDeque<FormattedText> code = new ArrayDeque<>();
         private String type;
         private Caption caption = null;
 
@@ -51,8 +42,8 @@ public class Code extends Block implements ICaptionable {
             return this;
         }
 
-        public Builder setCode(String code) {
-            this.code = code;
+        public Builder addCode(FormattedText code) {
+            this.code.addLast(code);
             return this;
         }
 
