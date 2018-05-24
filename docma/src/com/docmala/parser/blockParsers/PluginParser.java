@@ -80,8 +80,8 @@ public class PluginParser implements IBlockParser {
             errors.clear();
             ArrayDeque<Parameter> parameters = new ArrayDeque<>();
             ISource.Position begin = start.here();
+            dataBlock = null;
             if( start.here().equals('[') ) {
-                dataBlock = null;
                 final char[] end = {']', ','};
 
                 ParameterParser parameterParser = new ParameterParser();

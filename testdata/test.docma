@@ -15,6 +15,8 @@
 a, b, c, d
 ----
 
+WARNING: This is a **warning**
+
 [csvtable, separator=";"]
 ----
 1; 2; 3; 4; 2
@@ -28,6 +30,11 @@ is equal to
 CSVTABLE: test.csv
 
 since ''file'' is ''csvtable''s default parameter.
+
+[admonition, type=warning]
+----
+some text
+----
 
 = H1
 text1 and grab a :fa/beer:
