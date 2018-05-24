@@ -76,40 +76,76 @@ public class PluginParser implements IBlockParser {
 
     @Override
     public boolean tryParse(ISource.Window start, IBlockHolder document) {
-        if (start.here().equals('[') && !start.next().equals('[')) {
+        if (start.here().equals('[') && !start.next().equals('[') || Character.isUpperCase(start.here().get())) {
             errors.clear();
-            dataBlock = null;
-            final char[] end = {']', ','};
-            ISource.Position begin = start.here();
-
-            ParameterParser parameterParser = new ParameterParser();
             ArrayDeque<Parameter> parameters = new ArrayDeque<>();
+            ISource.Position begin = start.here();
+            if( start.here().equals('[') ) {
+                dataBlock = null;
+                final char[] end = {']', ','};
 
-            while (!start.here().isBlockEnd()) {
-                start.skipWhitespaces();
+                ParameterParser parameterParser = new ParameterParser();
 
-                if (start.here().equals(']')) {
-                    break;
+                while (!start.here().isBlockEnd()) {
+                    start.skipWhitespaces();
+
+                    if (start.here().equals(']')) {
+                        break;
+                    }
+                    start.moveForward();
+
+                    start = parameterParser.parse(start, end);
+                    parameters.addLast(parameterParser.parameter());
+                    errors.addAll(parameterParser.errors());
                 }
-                start.moveForward();
 
+                if (!start.here().equals(']')) {
+                    errors.addLast(new Error(start.here(), "Expected ']'"));
+                } else {
+                    start.moveForward();
+                }
+            } else {
+                ISource.Window startWindow = start.copy();
+                final char[] end = {':'};
+                final char[] paramEnd = {};
+
+                ParameterParser parameterParser = new ParameterParser();
+                // parse plugin name
                 start = parameterParser.parse(start, end);
                 parameters.addLast(parameterParser.parameter());
                 errors.addAll(parameterParser.errors());
+
+                if( start.here().equals(':')) {
+                    start.moveForward();
+
+                    // parse default parameter
+                    start = parameterParser.parse(start, paramEnd, true);
+                    parameters.addLast(parameterParser.parameter());
+                    errors.addAll(parameterParser.errors());
+
+                    String potentialPlugin = parameters.getFirst().name();
+                    if (!potentialPlugin.toUpperCase().equals(potentialPlugin)) {
+                        start.setTo(startWindow);
+                        return false;
+                    }
+
+                    if (parameters.getLast().value().isEmpty()) {
+                        errors.addLast(new Error(parameters.getLast().position(), "Parameter missing. (PLUGIN: parameter)"));
+                        return true;
+                    }
+                } else {
+                    start.setTo(startWindow);
+                    return false;
+                }
             }
 
-            if (!start.here().equals(']')) {
-                errors.addLast(new Error(start.here(), "Expected ']'"));
-            } else {
-                start.moveForward();
-            }
 
             Parameter pluginParameter = parameters.getFirst();
 
             IDocumentPlugin plugin = null;
             try {
                 Class<?> p = null;
-                p = Class.forName("com.docmala.plugins.document." + pluginParameter.name());
+                p = Class.forName("com.docmala.plugins.document." + pluginParameter.name().toLowerCase());
                 if (!IDocumentPlugin.class.isAssignableFrom(p)) {
                     throw new ClassNotFoundException();
                 }
@@ -125,6 +161,7 @@ public class PluginParser implements IBlockParser {
                 return true;
             }
             IDocumentPlugin.BlockProcessing blockProcessing = plugin.blockProcessing();
+            String defaultParameter = plugin.defaultParameter();
 
             if (blockProcessing != IDocumentPlugin.BlockProcessing.No) {
                 if (!parseBlock(start)) {
@@ -132,6 +169,23 @@ public class PluginParser implements IBlockParser {
                         errors.add(new Error(start.here(), "Plugin '" + pluginParameter.name() + "' requires a data block ('--')."));
                     }
                 }
+            }
+
+            if( defaultParameter != null ) {
+                ArrayDeque<Parameter> newParameters = new ArrayDeque<>();
+
+                for (Parameter parameter : parameters) {
+                    if (parameter.name().isEmpty()) {
+                        Parameter.Builder parameterBuilder = new Parameter.Builder();
+                        parameterBuilder.setName(defaultParameter);
+                        parameterBuilder.setPosition(parameter.position());
+                        parameterBuilder.setValue(parameter.value());
+                        newParameters.addLast(parameterBuilder.build());
+                    } else {
+                        newParameters.addLast(parameter);
+                    }
+                }
+                parameters = newParameters;
             }
 
             plugin.process(begin, start.here(), parameters, dataBlock, (Document) document, sourceProvider);

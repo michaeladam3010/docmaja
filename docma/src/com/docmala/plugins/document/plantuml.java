@@ -27,6 +27,11 @@ public class plantuml implements IDocumentPlugin {
     }
 
     @Override
+    public String defaultParameter() {
+        return null;
+    }
+
+    @Override
     public void process(SourcePosition start, SourcePosition end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
         errors.clear();
 

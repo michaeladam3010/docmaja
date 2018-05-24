@@ -1,3 +1,6 @@
+:fa/beer:
+:grimacing:
+
 ; test comment
 ; ...
 ; ...
@@ -19,6 +22,12 @@ a, b, c, d
 ----
 
 [csvtable, file="test.csv"]
+
+is equal to 
+
+CSVTABLE: test.csv
+
+since ''file'' is ''csvtable''s default parameter.
 
 = H1
 text1 and grab a :fa/beer:
@@ -89,8 +98,10 @@ text18
 
 
 text is here
-text with << link >> link
-text with << link, blubb blubb blubb >> link and text
+
+text with << anchor >> link
+
+text with << anchor, blubb blubb blubb >> link and text
 
 == H2
 text with [[anchor]] anchor
@@ -133,6 +144,7 @@ textt
 
 [plantuml]
 ----
+skinparam handwritten true
 actor Foo1
 boundary Foo2
 control Foo3

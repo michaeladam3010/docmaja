@@ -22,6 +22,11 @@ public class csvtable implements IDocumentPlugin {
         return errors;
     }
 
+    @Override
+    public String defaultParameter() {
+        return "file";
+    }
+
     Table.Cell buildCell(String value, SourcePosition start, SourcePosition end, boolean isHeading) {
         ArrayDeque<Block> blocks = new ArrayDeque<>();
         Content.Builder content = new Content.Builder();

@@ -36,6 +36,11 @@ public class formula implements IDocumentPlugin {
         return errors;
     }
 
+    @Override
+    public String defaultParameter() {
+        return null;
+    }
+
 
     String test(String formula) {
         VanesaFormulaLexer lexer = new VanesaFormulaLexer(CharStreams.fromString(formula));

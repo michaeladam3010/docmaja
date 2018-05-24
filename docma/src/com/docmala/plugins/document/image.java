@@ -23,6 +23,11 @@ public class image implements IDocumentPlugin {
     }
 
     @Override
+    public String defaultParameter() {
+        return "file";
+    }
+
+    @Override
     public void process(SourcePosition start, SourcePosition end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
         Parameter file = null;
         Image.Builder image = new Image.Builder();

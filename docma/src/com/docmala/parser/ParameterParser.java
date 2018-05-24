@@ -16,28 +16,33 @@ public class ParameterParser {
         return parameter;
     }
 
-    public ISource.Window parse(ISource.Window start, char[] end) {
+
+    public ISource.Window parse(ISource.Window start, char[] end, boolean valueOnly) {
         _errors = new ArrayDeque<>();
         start.skipWhitespaces();
         ISource.Position begin = start.here();
         StringBuilder name = new StringBuilder();
         StringBuilder value = new StringBuilder();
 
-        char[] endPlusEquals = new char[end.length + 1];
-        System.arraycopy(end, 0, endPlusEquals, 0, end.length);
-        endPlusEquals[end.length] = '=';
+        if( !valueOnly ) {
+            char[] endPlusEquals = new char[end.length + 1];
+            System.arraycopy(end, 0, endPlusEquals, 0, end.length);
+            endPlusEquals[end.length] = '=';
 
-        while (!start.here().isBlockEnd()) {
-            if (start.here().equals(endPlusEquals)) {
-                break;
+            while (!start.here().isBlockEnd()) {
+                if (start.here().equals(endPlusEquals)) {
+                    break;
+                }
+                name.append(start.here().get());
+                start.moveForward();
             }
-            name.append(start.here().get());
-            start.moveForward();
         }
 
-        if (start.here().equals('=')) {
-            start.moveForward();
-            start.skipWhitespaces();
+        if (start.here().equals('=') || valueOnly) {
+            if( !valueOnly ) {
+                start.moveForward();
+                start.skipWhitespaces();
+            }
 
             boolean searchQuotationMark = start.here().equals('"');
             boolean isQuotedParameter = searchQuotationMark;
@@ -68,5 +73,9 @@ public class ParameterParser {
 
         parameter = new Parameter(name.toString().trim(), value.toString(), begin);
         return start;
+    }
+
+    public ISource.Window parse(ISource.Window start, char[] end) {
+        return parse(start, end, false);
     }
 }
