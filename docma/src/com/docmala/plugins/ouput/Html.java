@@ -22,7 +22,8 @@ public class Html {
     String _js;
 
     public Html() throws IOException {
-        _css = getResourceFileAsString("codeHighlight.css");
+        _css = getResourceFileAsString("codeHighlight.css") + "\n";
+        _css += getResourceFileAsString("admonitions.css");
         _js = getResourceFileAsString("codeHighlight.js");
         _js = _js.replaceAll("<script", "&lt;script").replaceAll("</script", "&lt;/script");
     }
@@ -77,9 +78,27 @@ public class Html {
             generateContent((Content) block);
         } else if (block instanceof Code) {
             generateCode((Code) block, document);
+        } else if (block instanceof Admonition) {
+            generateAdmonition((Admonition) block, document);
         } else if (block instanceof NextParagraph) {
             _htmlBody.append("\n<p>");
         }
+    }
+
+    private void generateAdmonition(Admonition block, Document document) {
+        _htmlBody.append("<div class=\"admonition\">\n");
+        _htmlBody.append("<table>\n");
+        _htmlBody.append("  <tr>");
+        _htmlBody.append("    <td class=\"icon ").append(block.type.name().toLowerCase()).append("\"></td>\n");
+        _htmlBody.append("    <td class=\"content\">\n");
+        for (Block part : block.content) {
+            generateBlock(part, document);
+        }
+
+        _htmlBody.append("\n    </td>\n");
+        _htmlBody.append("  </tr>\n");
+        _htmlBody.append("</table>\n");
+        _htmlBody.append("</div>\n");
     }
 
     private void generateAnchors(Block block, Document document) {

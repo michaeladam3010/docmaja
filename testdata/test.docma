@@ -15,7 +15,35 @@
 a, b, c, d
 ----
 
-WARNING: This is a **warning**
+NOTE: note
+TIP: tip
+WARNING: warning
+CAUTION: caution
+IMPORTANT: important
+IDEA: idea
+REMINDER: reminder
+
+[important]
+----
+One can put any valid docma markup in anm admonition block
+
+[plantuml]
+--
+skinparam handwritten true
+actor Foo1
+boundary Foo2
+control Foo3
+entity Foo4
+database Foo5
+collections Foo6
+Foo1 -> Foo2 : To boundary
+Foo1 -> Foo3 : To control
+Foo1 -> Foo4 : To entity
+Foo1 -> Foo5 : To database
+Foo1 -> Foo6 : To collections
+--
+
+----
 
 [csvtable, separator=";"]
 ----
