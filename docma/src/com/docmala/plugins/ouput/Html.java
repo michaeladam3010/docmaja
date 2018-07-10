@@ -15,22 +15,19 @@ import java.util.stream.Collectors;
 
 public class Html {
 
-    HtmlDocument _html;
-    StringBuilder _htmlBody;
-    Map<String, Integer> captionNumbers = new HashMap<>();
-    String _css;
-    String _js;
+    private HtmlDocument _html;
+    private StringBuilder _htmlBody;
+    private Map<String, Integer> captionNumbers = new HashMap<>();
+    private String _css;
+    private String _js = "";
 
     public Html() throws IOException {
-        _css = getResourceFileAsString("codeHighlight.css") + "\n";
-        _css += getResourceFileAsString("admonitions.css");
-        _js = getResourceFileAsString("codeHighlight.js");
-        _js = _js.replaceAll("<script", "&lt;script").replaceAll("</script", "&lt;/script");
+        _css = getResourceFileAsString("admonitions.css");
     }
 
     public String getResourceFileAsString(String resourceFileName) throws IOException {
         InputStream is = getClass().getClassLoader().getResourceAsStream(resourceFileName);
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
             return reader.lines().collect(Collectors.joining("\n"));
         }
     }
@@ -46,7 +43,6 @@ public class Html {
         _html.head().append("<script>\n");
         _html.head().append(_js);
         _html.head().append("\n</script>\n");
-        _html.head().append("\n<script>hljs.initHighlightingOnLoad();</script>\n");
 
         _htmlBody.append("<p>");
         for (Block part : document.content()) {
@@ -74,10 +70,10 @@ public class Html {
             generateTable((Table) block, document);
         } else if (block instanceof Image) {
             generateImage((Image) block, document);
+        } else if (block instanceof Code) { // has to be checked prior to Content since it extends Content
+            generateCode((Code) block, document);
         } else if (block instanceof Content) {
             generateContent((Content) block);
-        } else if (block instanceof Code) {
-            generateCode((Code) block, document);
         } else if (block instanceof Admonition) {
             generateAdmonition((Admonition) block, document);
         } else if (block instanceof NextParagraph) {
@@ -102,7 +98,7 @@ public class Html {
     }
 
     private void generateAnchors(Block block, Document document) {
-        if( block.anchors != null ) {
+        if (block.anchors != null) {
             for (Anchor anchor : block.anchors) {
                 _htmlBody.append("<a name=\"").append(anchor.name).append("\"></a>");
             }
@@ -146,10 +142,6 @@ public class Html {
         _htmlBody.append("</figure>");
     }
 
-    void writeHeader() {
-
-    }
-
     void generateEscapedText(String text) {
         text = text.replaceAll("<", "&lt;");
         text = text.replaceAll(">", "&gt;");
@@ -163,64 +155,61 @@ public class Html {
         _htmlBody.append(id(content));
         _htmlBody.append(">");
         for (FormattedText text : content.content()) {
-            if( text instanceof FormattedText.Image ) {
-                FormattedText.Image image = (FormattedText.Image)text;
+            if (text instanceof FormattedText.Image) {
+                FormattedText.Image image = (FormattedText.Image) text;
                 _htmlBody.append("<img style=\"height:1.2em; vertical-align:text-bottom;\" src=\"data:image/");
                 _htmlBody.append(image.fileType);
                 _htmlBody.append(";base64,");
                 _htmlBody.append(Base64.getEncoder().encodeToString(image.data));
                 _htmlBody.append("\">");
                 _htmlBody.append(" ");
-            } else if( text instanceof FormattedText.Link ) {
-                FormattedText.Link link = (FormattedText.Link)text;
+            } else if (text instanceof FormattedText.Link) {
+                FormattedText.Link link = (FormattedText.Link) text;
                 String visualText = link.text;
-                if( visualText.isEmpty() ) {
+                if (visualText.isEmpty()) {
                     visualText = link.url;
                 }
 
-                if( link.type == FormattedText.Link.Type.IntraFile ) {
+                if (link.type == FormattedText.Link.Type.IntraFile) {
                     _htmlBody.append("<a href=\"#").append(link.url).append("\">");
                 }
                 _htmlBody.append(visualText).append("</a>");
             } else {
+                FormattedText.Style style = text.style;
 
-                if (text.bold) {
-                    _htmlBody.append("<b>");
-                }
-                if (text.italic) {
-                    _htmlBody.append("<i>");
-                }
-                if (text.underlined) {
-                    _htmlBody.append("<u>");
-                }
-                if (text.stroked) {
-                    _htmlBody.append("<del>");
-                }
-                if (text.monospaced) {
-                    _htmlBody.append("<tt>");
-                }
-                generateEscapedText(text.text);
-                _htmlBody.append(" ");
+                if(style == null) {
+                    generateEscapedText(text.text);
+                } else {
+                    _htmlBody.append("<span style=\"");
 
-                if (text.monospaced) {
-                    _htmlBody.append("</tt>");
-                }
-                if (text.stroked) {
-                    _htmlBody.append("</del>");
-                }
-                if (text.underlined) {
-                    _htmlBody.append("</u>");
-                }
-                if (text.italic) {
-                    _htmlBody.append("</i>");
-                }
-                if (text.bold) {
-                    _htmlBody.append("</b>");
+                    if (style.color.isColored()) {
+                        _htmlBody.append(String.format("color: #%02x%02x%02x;", style.color.r, style.color.g, style.color.b));
+                    }
+                    if (style.bold) {
+                        _htmlBody.append("font-weight: bold;");
+                    }
+                    if (style.italic) {
+                        _htmlBody.append("font-style: italic;");
+                    }
+                    if (style.underlined) {
+                        _htmlBody.append("text-decoration: underline;");
+                    }
+                    if (style.stroked) {
+                        _htmlBody.append("text-decoration: line-through;");
+                    }
+                    if (style.monospaced) {
+                        _htmlBody.append("font-family: 'Lucida Console', monospace;");
+                    }
+
+                    _htmlBody.append("\">");
+
+                    generateEscapedText(text.text);
+
+                    _htmlBody.append("</span>");
                 }
             }
         }
         _htmlBody.append("</span>");
-        //_htmlBody.append("</br>");
     }
 
     void generateHeadline(Headline headline, Document document) {
@@ -232,16 +221,16 @@ public class Html {
     }
 
     void generateCode(Code code, Document document) {
-
         _htmlBody.append("<figure>");
         if (code.type != null && !code.type.isEmpty()) {
-            _htmlBody.append("<pre").append(id(code)).append("> <code class=\"").append(code.type).append("\">\n");
+            _htmlBody.append("<pre").append(id(code)).append("><code class=\"").append(code.type).append("\">\n");
         } else {
-            _htmlBody.append("<pre").append(id(code)).append("> <code>\n");
+            _htmlBody.append("<pre").append(id(code)).append("><code>\n");
         }
 
-        _htmlBody.append(code.code);
-        _htmlBody.append("</code> </pre>\n");
+        generateContent(code);
+
+        _htmlBody.append("</code></pre>\n");
         generateCaption(code.caption, document);
         _htmlBody.append("</figure>");
     }
@@ -290,8 +279,8 @@ public class Html {
             _htmlBody.append("<tr>");
             String end = "";
 
-            for (Table.Cell cell: row) {
-                if( cell == null ) {
+            for (Table.Cell cell : row) {
+                if (cell == null) {
                     continue;
                 }
                 StringBuilder span = new StringBuilder();
@@ -316,10 +305,10 @@ public class Html {
                     end = "</td>";
                 }
 
-                for( Block block: cell.content ) {
+                for (Block block : cell.content) {
                     generateBlock(block, document);
                 }
-                _htmlBody.append( end );
+                _htmlBody.append(end);
 
                 firstColumn = false;
             }
@@ -342,10 +331,11 @@ public class Html {
         }
 
         public void write(String fileName) throws IOException {
-            try(BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
                 writer.write("<!doctype html>\n");
                 writer.write("<html>\n");
                 writer.write("<head>\n");
+                writer.write("<meta charset=\"UTF-8\">");
                 writer.write(_head.toString());
                 writer.write("\n");
                 writer.write("</head>\n");

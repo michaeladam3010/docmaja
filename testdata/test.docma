@@ -25,7 +25,7 @@ REMINDER: reminder
 
 [important]
 ----
-One can put any valid docma markup in anm admonition block
+One can put any valid docma markup in an admonition block
 
 [plantuml]
 --
@@ -130,9 +130,9 @@ text17
 text18
 
 = H1
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-
-text is here
+Text is here
 
 text with << anchor >> link
 
@@ -164,10 +164,33 @@ test //italic// __**bold underline**__ ''mono'' --stroked--
 Jetzt kommt Code:
 [code]
 ----
-int main ()
-{
-    out = "test";
+#include <iostream>
+
+struct Test {
+    int i;
+    Test(int i) : i{i} {
+        try {
+            if(i<42)
+                throw 42;
+        } catch(..) {
+            throw;
+        }
+    }
+};
+
+int main() {
+    auto out = "test string";
+    Test t0(42);
+    Test t{42};
+    return t.i;
 }
+----
+Jetzt nicht mehr :)
+
+Jetzt kommt Code:
+[code]
+----
+<span class="hljs-keyword">TestText<br>
 
 ----
 Jetzt nicht mehr :)
@@ -175,7 +198,7 @@ Jetzt nicht mehr :)
 
 [include, file=included.docma]
 
-textt
+text
 
 [plantuml]
 ----
