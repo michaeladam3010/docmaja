@@ -13,7 +13,7 @@ public class lorem implements IDocumentPlugin {
 
     @Override
     public BlockProcessing blockProcessing() {
-        return BlockProcessing.Required;
+        return BlockProcessing.No;
     }
 
     @Override
@@ -33,7 +33,6 @@ public class lorem implements IDocumentPlugin {
 
    @Override
     public void process(SourcePosition start, SourcePosition end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
-
         String[] loremIpsumSeperated = loremIpsum.split(" ");
         String loremIpsumOutput = "";
 
@@ -50,5 +49,4 @@ public class lorem implements IDocumentPlugin {
         cb.setStart(start);
         document.append(cb.build());
     }
-
 }
