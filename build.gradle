@@ -20,6 +20,7 @@ dependencies {
     compile 'com.jsoniter:jsoniter:0.9.18'
     compile group: 'xerces', name: 'xercesImpl', version: '2.11.0'
     compile 'org.jsoup:jsoup:1.11.3'
+    compile 'org.reflections:reflections:0.9.11'
 }
 
 task copyToLib(type: Copy) {

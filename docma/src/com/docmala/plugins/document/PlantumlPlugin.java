@@ -13,7 +13,8 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-public class plantuml implements IDocumentPlugin {
+@Plugin("plantuml")
+public class PlantumlPlugin implements IDocumentPlugin {
     ArrayDeque<Error> errors = new ArrayDeque<>();
 
     @Override

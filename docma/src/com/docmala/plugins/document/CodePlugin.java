@@ -2,7 +2,6 @@ package com.docmala.plugins.document;
 
 import com.docmala.Error;
 import com.docmala.parser.*;
-import com.docmala.parser.blocks.Code;
 import com.docmala.plugins.IDocumentPlugin;
 
 import javax.script.Invocable;
@@ -24,7 +23,8 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.NodeTraversor;
 import org.jsoup.select.NodeVisitor;
 
-public class code implements IDocumentPlugin {
+@Plugin("Code")
+public class CodePlugin implements IDocumentPlugin {
     private ArrayDeque<Error> errors = new ArrayDeque<>();
     private static final Invocable engine = createScriptEngine();
     private static Exception scriptEngineError = null;
@@ -32,7 +32,7 @@ public class code implements IDocumentPlugin {
 
     private static Invocable createScriptEngine() {
         try {
-            InputStream highlight_js_input = code.class.getClassLoader().getResourceAsStream("highlight.pack.js");
+            InputStream highlight_js_input = CodePlugin.class.getClassLoader().getResourceAsStream("highlight.pack.js");
 
             ScriptEngineManager engineManager =
                     new ScriptEngineManager();
@@ -89,7 +89,7 @@ public class code implements IDocumentPlugin {
     private static Map<String, FormattedText.Style> parseCSSFile() {
         Map<String, FormattedText.Style> ret = new HashMap<>();
         try {
-            String inputCSS = new String(code.class.getClassLoader().getResourceAsStream("codeHighlight.css").readAllBytes());
+            String inputCSS = new String(CodePlugin.class.getClassLoader().getResourceAsStream("codeHighlight.css").readAllBytes());
             String withoutComments = removeComments(inputCSS);
             char[] css = removeWhitespaces(withoutComments).toCharArray();
 
@@ -192,7 +192,7 @@ public class code implements IDocumentPlugin {
 
     @Override
     public void process(SourcePosition start, SourcePosition end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
-        Code.Builder code = new Code.Builder();
+        com.docmala.parser.blocks.Code.Builder code = new com.docmala.parser.blocks.Code.Builder();
         code.setStart(start);
         code.setEnd(end);
         String type = null;
@@ -230,10 +230,10 @@ public class code implements IDocumentPlugin {
     }
 
     private class FormattingVisitor implements NodeVisitor {
-        private Code.Builder out;
+        private com.docmala.parser.blocks.Code.Builder out;
         private Stack<FormattedText.Style> style = new Stack<>();
 
-        FormattingVisitor(Code.Builder out) {
+        FormattingVisitor(com.docmala.parser.blocks.Code.Builder out) {
             this.out = out;
         }
 

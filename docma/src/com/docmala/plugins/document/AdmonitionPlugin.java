@@ -2,14 +2,20 @@ package com.docmala.plugins.document;
 
 import com.docmala.Error;
 import com.docmala.parser.*;
-import com.docmala.parser.blockParsers.ContentParser;
-import com.docmala.parser.blocks.Admonition;
 import com.docmala.plugins.IDocumentPlugin;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
 
-public class admonition implements IDocumentPlugin {
+@Plugin(value = "admonition", defaultParameters = "type=note")
+@Plugin(value = "caution", defaultParameters = "type=caution")
+@Plugin(value = "note", defaultParameters = "type=note")
+@Plugin(value = "idea", defaultParameters = "type=idea")
+@Plugin(value = "important", defaultParameters = "type=important")
+@Plugin(value = "tip", defaultParameters = "type=tip")
+@Plugin(value = "warning", defaultParameters = "type=warning")
+@Plugin(value = "reminder", defaultParameters = "type=reminder")
+public class AdmonitionPlugin implements IDocumentPlugin {
     ArrayDeque<Error> errors = new ArrayDeque<>();
 
     @Override
@@ -27,14 +33,10 @@ public class admonition implements IDocumentPlugin {
         return "text";
     }
 
-    protected String defaultType() {
-        return "note";
-    }
-
     @Override
     public void process(SourcePosition start, SourcePosition end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
         String text = "";
-        String type = defaultType();
+        String type = "";
 
         if( block != null ) {
             text = block.data;
@@ -53,9 +55,9 @@ public class admonition implements IDocumentPlugin {
     }
 
     protected void addToDocument(SourcePosition start, SourcePosition end, Document document, ISourceProvider sourceProvider, String type, String text ) {
-        Admonition.Type typeEnum = Admonition.Type.Note;
+        com.docmala.parser.blocks.Admonition.Type typeEnum = com.docmala.parser.blocks.Admonition.Type.Note;
 
-        for (Admonition.Type b : Admonition.Type.values()) {
+        for (com.docmala.parser.blocks.Admonition.Type b : com.docmala.parser.blocks.Admonition.Type.values()) {
             if (b.name().equalsIgnoreCase(type)) {
                 typeEnum = b;
                 break;
@@ -66,9 +68,9 @@ public class admonition implements IDocumentPlugin {
         MemorySource memorySource = new MemorySource(start.fileName(), text, start.line() );
         try {
             parser.parse(memorySource, sourceProvider);
-            document.append(new Admonition(start, end, new ArrayDeque<Anchor>(), parser.document().content(), typeEnum));
+            document.append(new com.docmala.parser.blocks.Admonition(start, end, new ArrayDeque<>(), parser.document().content(), typeEnum));
         } catch (IOException e) {
-            errors.addLast(new Error(start, "Exception while parsing admonition block: " + e.getMessage()));
+            errors.addLast(new Error(start, "Exception while parsing Admonition block: " + e.getMessage()));
         }
     }
 }

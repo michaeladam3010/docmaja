@@ -8,7 +8,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import java.util.ArrayDeque;
 
-public class lorem implements IDocumentPlugin {
+@Plugin("lorem")
+public class LoremPlugin implements IDocumentPlugin {
     ArrayDeque<Error> errors = new ArrayDeque<>();
 
     @Override
