@@ -3,14 +3,18 @@ package com.docmala.parser.blockParsers;
 import com.docmala.Error;
 import com.docmala.parser.*;
 import com.docmala.plugins.IDocumentPlugin;
+import com.docmala.plugins.document.Plugin;
+import org.reflections.Reflections;
 
 import java.util.ArrayDeque;
+import java.util.Set;
 
 public class PluginParser implements IBlockParser {
     final ISourceProvider sourceProvider;
     final StringBuilder block = new StringBuilder();
     DataBlock dataBlock;
     ArrayDeque<Error> errors = new ArrayDeque<>();
+    Set<Class<? extends IDocumentPlugin>> plugins = new Reflections("com.docmala.plugins.document").getSubTypesOf(IDocumentPlugin.class);
 
     public PluginParser(ISourceProvider sourceProvider) {
         this.sourceProvider = sourceProvider;
@@ -144,12 +148,36 @@ public class PluginParser implements IBlockParser {
 
             IDocumentPlugin plugin = null;
             try {
-                Class<?> p = null;
-                p = Class.forName("com.docmala.plugins.document." + pluginParameter.name().toLowerCase());
-                if (!IDocumentPlugin.class.isAssignableFrom(p)) {
+                Class<? extends IDocumentPlugin> p = null;
+                outerloop: for(Class<? extends IDocumentPlugin> dp : plugins)
+                    for ( Plugin a : dp.getAnnotationsByType(Plugin.class) )
+                        if(a.value().equalsIgnoreCase(pluginParameter.name())) {
+                            p = dp;
+
+                            String[] args = a.defaultParameters().split(" ");
+                            for(String arg : args) {
+                                String[] argSplitted = arg.split("=");
+                                if(argSplitted.length != 2)
+                                    continue;
+
+                                boolean found = false;
+                                for(Parameter params : parameters) {
+                                    if(params.name().equalsIgnoreCase(argSplitted[0])) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if(!found)
+                                 parameters.addLast(new Parameter(argSplitted[0], argSplitted[1], start.here()));
+                            }
+                            break outerloop;
+                        }
+
+                if (p == null) {
                     throw new ClassNotFoundException();
                 }
-                plugin = (IDocumentPlugin) p.newInstance();
+
+                plugin = p.newInstance();
             } catch (ClassNotFoundException e) {
                 errors.add(new Error(start.here(), "Plugin '" + pluginParameter.name() + "' not found."));
                 return true;
@@ -157,11 +185,10 @@ public class PluginParser implements IBlockParser {
                 errors.add(new Error(start.here(), "Plugin '" + pluginParameter.name() + "' cannot be accessed."));
                 return true;
             } catch (InstantiationException e) {
-                errors.add(new Error(start.here(), "Plugin '" + pluginParameter.name() + "' cannot be instanciated."));
+                errors.add(new Error(start.here(), "Plugin '" + pluginParameter.name() + "' cannot be instantiated."));
                 return true;
             }
             IDocumentPlugin.BlockProcessing blockProcessing = plugin.blockProcessing();
-            String defaultParameter = plugin.defaultParameter();
 
             if (blockProcessing != IDocumentPlugin.BlockProcessing.No) {
                 if (!parseBlock(start)) {
@@ -171,6 +198,7 @@ public class PluginParser implements IBlockParser {
                 }
             }
 
+            String defaultParameter = plugin.defaultParameter();
             if( defaultParameter != null ) {
                 ArrayDeque<Parameter> newParameters = new ArrayDeque<>();
 

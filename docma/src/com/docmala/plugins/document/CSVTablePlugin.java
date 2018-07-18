@@ -9,7 +9,8 @@ import com.docmala.plugins.IDocumentPlugin;
 import java.io.IOException;
 import java.util.ArrayDeque;
 
-public class csvtable implements IDocumentPlugin {
+@Plugin("CSVTable")
+public class CSVTablePlugin implements IDocumentPlugin {
     ArrayDeque<Error> errors = new ArrayDeque<>();
 
     @Override

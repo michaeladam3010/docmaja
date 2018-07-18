@@ -10,7 +10,8 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 
-public class include implements IDocumentPlugin {
+@Plugin("include")
+public class IncludePlugin implements IDocumentPlugin {
     ArrayDeque<Error> errors = new ArrayDeque<>();
 
     @Override

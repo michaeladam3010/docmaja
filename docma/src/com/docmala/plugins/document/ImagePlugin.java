@@ -9,7 +9,8 @@ import com.docmala.plugins.IDocumentPlugin;
 import java.io.IOException;
 import java.util.ArrayDeque;
 
-public class image implements IDocumentPlugin {
+@Plugin("image")
+public class ImagePlugin implements IDocumentPlugin {
     ArrayDeque<Error> errors = new ArrayDeque<>();
 
     @Override
@@ -43,7 +44,6 @@ public class image implements IDocumentPlugin {
             errors.addLast(new Error(parameters.getFirst().position(), "Parameter 'file' missing."));
             return;
         }
-
 
         try {
             byte[] data = sourceProvider.getBinary(file.value());

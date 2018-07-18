@@ -22,7 +22,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayDeque;
 
-public class formula implements IDocumentPlugin {
+@Plugin("formula")
+public class FormulaPlugin implements IDocumentPlugin {
     ArrayDeque<Error> errors = new ArrayDeque<>();
     VanesaFormulaParseRules extractor = new VanesaFormulaParseRules();
 
@@ -63,7 +64,7 @@ public class formula implements IDocumentPlugin {
 
         TeXFormula latexFormula = new TeXFormula(test(block.data));
 
-        // render the formla to an icon of the same size as the formula.
+        // render the formla to an icon of the same size as the Formula.
         TeXIcon icon = latexFormula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
 
         // insert a border
