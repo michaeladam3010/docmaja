@@ -162,6 +162,8 @@ test //italic// __**bold underline**__ ''mono'' --stroked--
 ----
 
 [lorem]
+
+.Hat einen Titel
 [code]
 ----
 #include <iostream>
@@ -184,9 +186,8 @@ int main() {
     Test t{42};
     return t.i;
 }
-
 ----
-[lorem]
+
 [code]
 ----
 <span class="hljs-keyword">TestText<br>
