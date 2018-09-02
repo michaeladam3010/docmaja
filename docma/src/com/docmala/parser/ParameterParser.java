@@ -21,6 +21,7 @@ public class ParameterParser {
         _errors = new ArrayDeque<>();
         start.skipWhitespaces();
         ISource.Position begin = start.here();
+        ISource.Position valueBegin = null;
         StringBuilder name = new StringBuilder();
         StringBuilder value = new StringBuilder();
 
@@ -43,6 +44,7 @@ public class ParameterParser {
                 start.moveForward();
                 start.skipWhitespaces();
             }
+            valueBegin = start.here();
 
             boolean searchQuotationMark = start.here().equals('"');
             boolean isQuotedParameter = searchQuotationMark;
@@ -71,7 +73,7 @@ public class ParameterParser {
             }
         }
 
-        parameter = new Parameter(name.toString().trim(), value.toString(), begin);
+        parameter = new Parameter(name.toString().trim(), value.toString(), begin, valueBegin);
         return start;
     }
 

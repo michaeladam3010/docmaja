@@ -13,14 +13,18 @@ class PreviewPage : public QWebEnginePage
 {
 public:
     PreviewPage();
-    void updateContent(const QString &head, const QString &body);
+    void updateContent(const QString &head, const QString &body, const QMap<int, QPair<int, QString>> &ids);
     void resetContent();
-    void highlightLine(int line);
-    void scrollToLine(int line);
+    void highlight(int position);
+    void scrollTo(int position);
+
 private:
     void update();
 
+    QString idAtPosition(int position) const;
+
     QString _currentContent;
+    QMap<int, QPair<int, QString>> _ids;
     bool _skeletonPresent = false;
     QWebSocketServer _webSocketServer;
     QWebSocket* _clientConnection = nullptr;

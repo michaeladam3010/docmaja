@@ -49,6 +49,10 @@ public class CaptionParser implements IBlockParser, IBlockHolder {
             errors.addAll(contentParser.errors());
             caption.setEnd(start.here());
             document.append(caption.build());
+
+            // skip tailing blockend character
+            start.moveForward();
+
             return true;
         }
         return false;

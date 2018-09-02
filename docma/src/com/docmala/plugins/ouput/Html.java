@@ -5,6 +5,7 @@ import com.docmala.parser.Block;
 import com.docmala.parser.Document;
 import com.docmala.parser.FormattedText;
 import com.docmala.parser.blocks.*;
+import com.jsoniter.output.JsonStream;
 
 import java.io.*;
 import java.util.ArrayDeque;
@@ -20,9 +21,12 @@ public class Html {
     private Map<String, Integer> captionNumbers = new HashMap<>();
     private String _css;
     private String _js = "";
+    int idCounter = 0;
+    String firstUrl = "";
 
     public Html() throws IOException {
-        _css = getResourceFileAsString("admonitions.css");
+        _css = getResourceFileAsString("codeHighlight.css") + "\n";
+        _css += getResourceFileAsString("admonitions.css");
     }
 
     public String getResourceFileAsString(String resourceFileName) throws IOException {
@@ -32,7 +36,27 @@ public class Html {
         }
     }
 
+    private String id(Block block) {
+        idCounter++;
+        String id = "dmhl_" + Integer.toString(idCounter);
+        if( firstUrl.isEmpty() )
+            firstUrl = block.start.fileName();
+
+        if( block.start.fileName() != firstUrl ) {
+            return "gen_dmhl_" + Integer.toString(idCounter);
+        }
+        try {
+            _html.ids().add(new HtmlDocument.IDInformation(block.start.position(), block.end.position(), id));
+        } catch (Exception e) {
+            int i = 0;
+        }
+
+        return id;
+    }
+
     public HtmlDocument generate(Document document) {
+        idCounter = 0;
+
         _html = new HtmlDocument();
         _htmlBody = _html.body();
 
@@ -44,16 +68,28 @@ public class Html {
         _html.head().append(_js);
         _html.head().append("\n</script>\n");
 
-        _htmlBody.append("<p>");
         for (Block part : document.content()) {
             generateBlock(part, document);
         }
-        _htmlBody.append("</p>");
+
         return _html;
     }
 
-    private String id(Block b) {
-        return " id=\"line_" + String.valueOf(b.start.line()) + "\"";
+    private void appendStartTag(String tag, String id, String classes) {
+        _htmlBody.append("<").append(tag);
+        if( id != null && !id.isEmpty() ) {
+            _htmlBody.append(" id=\"").append(id).append("\"");
+
+        }
+        if( classes != null && !classes.isEmpty() ) {
+            _htmlBody.append(" class=\"").append(classes).append("\"");
+
+        }
+        _htmlBody.append(">");
+    }
+
+    private void appendEndTag(String tag) {
+        _htmlBody.append("</").append(tag).append(">");
     }
 
     void generateBlock(Block block, Document document) {
@@ -61,7 +97,7 @@ public class Html {
             return;
 
         generateAnchors(block, document);
-
+        //_htmlBody.append("<span id='").append(generateId(block)).append("'>");
         if (block instanceof Headline) {
             generateHeadline((Headline) block, document);
         } else if (block instanceof List) {
@@ -77,12 +113,14 @@ public class Html {
         } else if (block instanceof Admonition) {
             generateAdmonition((Admonition) block, document);
         } else if (block instanceof NextParagraph) {
-            _htmlBody.append("\n<p>");
+            _htmlBody.append("\n<br>");
         }
+        //_htmlBody.append("</span>");
     }
 
     private void generateAdmonition(Admonition block, Document document) {
-        _htmlBody.append("<div class=\"admonition\">\n");
+        appendStartTag("div", id(block), "admonition");
+        //_htmlBody.append("<div class=\"admonition\"").append(id(block)).append(">\n");
         _htmlBody.append("<table>\n");
         _htmlBody.append("  <tr>");
         _htmlBody.append("    <td class=\"icon ").append(block.type.name().toLowerCase()).append("\"></td>\n");
@@ -130,7 +168,7 @@ public class Html {
     }
 
     private void generateImage(Image image, Document document) {
-        _htmlBody.append("<figure>");
+        appendStartTag("figure", id(image), null);
         _htmlBody.append("<img src=\"data:image/");
         _htmlBody.append(image.fileType);
         _htmlBody.append(";base64,");
@@ -139,7 +177,7 @@ public class Html {
 
         generateCaption(image.caption, document);
 
-        _htmlBody.append("</figure>");
+        appendEndTag("figure");
     }
 
     void generateEscapedText(String text) {
@@ -151,9 +189,10 @@ public class Html {
     void generateContent(Content content) {
         if (content == null)
             return;
-        _htmlBody.append("<span");
-        _htmlBody.append(id(content));
-        _htmlBody.append(">");
+        appendStartTag("span", id(content), null );
+//        _htmlBody.append("<span");
+//        _htmlBody.append(id(content));
+//        _htmlBody.append(">");
         for (FormattedText text : content.content()) {
             if (text instanceof FormattedText.Image) {
                 FormattedText.Image image = (FormattedText.Image) text;
@@ -209,28 +248,31 @@ public class Html {
                 }
             }
         }
-        _htmlBody.append("</span>");
+        _htmlBody.append(" </span>");
     }
 
     void generateHeadline(Headline headline, Document document) {
         if (headline.level <= 6) {
-            _htmlBody.append("<h").append(headline.level).append(">");
+            String h = "h" + String.valueOf(headline.level);
+            appendStartTag(h, id(headline), null );
             generateBlock(headline.content, document);
-            _htmlBody.append("</h").append(headline.level).append(">");
+            appendEndTag(h);
         }
     }
 
     void generateCode(Code code, Document document) {
         _htmlBody.append("<figure>");
+        appendStartTag("pre", id(code), null);
         if (code.type != null && !code.type.isEmpty()) {
-            _htmlBody.append("<pre").append(id(code)).append("><code class=\"").append(code.type).append("\">\n");
+            _htmlBody.append("<code class=\"").append(code.type).append("\">\n");
         } else {
-            _htmlBody.append("<pre").append(id(code)).append("><code>\n");
+            _htmlBody.append("<code>\n");
         }
 
         generateContent(code);
 
-        _htmlBody.append("</code></pre>\n");
+        _htmlBody.append("</code>");
+        appendEndTag("pre");
         generateCaption(code.caption, document);
         _htmlBody.append("</figure>");
     }
@@ -272,6 +314,7 @@ public class Html {
     }
 
     void generateTable(Table table, Document document) {
+        appendStartTag("figure", id(table), null);
         _htmlBody.append("<table border=\"1\">\n");
         boolean firstRow = true;
         for (Table.Cell[] row : table.cells()) {
@@ -316,11 +359,32 @@ public class Html {
             firstRow = false;
         }
         _htmlBody.append("</table>\n");
+        generateCaption(table.caption, document);
+        appendEndTag("figure");
     }
 
     static public class HtmlDocument {
+        static public final class Header {
+            ArrayDeque<String> js;
+            ArrayDeque<String> css;
+        }
+
+        static public final class IDInformation {
+            public final int start;
+            public final int end;
+            public final String id;
+
+            IDInformation(int start, int end, String id) {
+                this.start = start;
+                this.end = end;
+                this.id = id;
+            }
+
+        }
+
         StringBuilder _head = new StringBuilder();
         StringBuilder _body = new StringBuilder();
+        ArrayDeque<IDInformation> _ids = new ArrayDeque<>();
 
         public StringBuilder head() {
             return _head;
@@ -329,6 +393,7 @@ public class Html {
         public StringBuilder body() {
             return _body;
         }
+        public ArrayDeque<IDInformation> ids() { return _ids; }
 
         public void write(String fileName) throws IOException {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
@@ -344,6 +409,10 @@ public class Html {
                 writer.write(_body.toString());
                 writer.write("\n");
                 writer.write("</body>\n");
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName + ".json"))) {
+                writer.write(JsonStream.serialize(_ids));
             }
         }
     }

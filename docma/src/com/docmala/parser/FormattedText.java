@@ -38,6 +38,17 @@ public class FormattedText {
         public boolean stroked = false;
         public boolean underlined = false;
         public Color color = new Color();
+
+        public Style() {}
+
+        public Style(Style other) {
+            bold = other.bold;
+            italic = other.italic;
+            monospaced = other.monospaced;
+            stroked = other.stroked;
+            underlined = other.underlined;
+            color = other.color;
+        }
     }
 
     public static class Link extends FormattedText {
@@ -169,17 +180,26 @@ public class FormattedText {
         }
 
         public FormattedText build() {
-            return new FormattedText(text, style);
+            if( style == null )
+                return new FormattedText(text, null);
+            return new FormattedText(text, new Style(style));
         }
 
         public FormattedText.Link buildLink() {
-            Link link = new Link(text, url, type, style);
+            Link link;
+            if( style == null )
+                link = new Link(text, url, type, null);
+            else
+                link = new Link(text, url, type, new Style(style));
+
             url = "";
             return link;
         }
 
         public FormattedText.Image buildImage(byte[] data, String fileType) {
-            return new Image(text, data, fileType, style);
+            if( style == null )
+                return new Image(text, data, fileType, null);
+            return new Image(text, data, fileType, new Style(style));
         }
     }
 }

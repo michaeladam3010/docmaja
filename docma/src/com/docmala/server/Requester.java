@@ -17,6 +17,9 @@ public class Requester {
     int idCounter = 0;
     Map<Integer, ResultHandler> openRequests = new HashMap<>();
 
+    // TODO: shutdown method -> scheduler.shutdown()
+    // TODO: change wait / notify to CompletableFuture
+
     public Requester(WebSocket connection) {
         this.connection = connection;
     }
@@ -78,8 +81,8 @@ public class Requester {
     }
 
     static public class Request {
-        final public String jsonrpc = "2.0";
-        final public String method;
+        public final String jsonrpc = "2.0";
+        public final String method;
         public int id;
 
         public Request(String method) {
@@ -100,8 +103,11 @@ public class Requester {
         void waitForFinished() {
             synchronized (this) {
                 try {
-                    this.wait();
+                    while( !isFinished ) {
+                        this.wait();
+                    }
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }

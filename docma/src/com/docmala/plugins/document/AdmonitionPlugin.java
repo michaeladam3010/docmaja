@@ -37,24 +37,28 @@ public class AdmonitionPlugin implements IDocumentPlugin {
     public void process(SourcePosition start, SourcePosition end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
         String text = "";
         String type = "";
+        SourcePosition textStart = null;
 
         if( block != null ) {
             text = block.data;
+            textStart = block.position;
         }
 
         for (Parameter parameter : parameters) {
             if (parameter.name().equals("text")) {
                 text = parameter.value();
+                textStart = parameter.valuePosition();
             }
             if (parameter.name().equals("type")) {
                 type = parameter.value();
             }
         }
 
-        addToDocument(start, end, document, sourceProvider, type, text);
+        if( textStart != null )
+            addToDocument(start, start.fromHere(type.length()), textStart, document, sourceProvider, type, text);
     }
 
-    protected void addToDocument(SourcePosition start, SourcePosition end, Document document, ISourceProvider sourceProvider, String type, String text ) {
+    protected void addToDocument(SourcePosition start, SourcePosition end, SourcePosition blockStart, Document document, ISourceProvider sourceProvider, String type, String text ) {
         com.docmala.parser.blocks.Admonition.Type typeEnum = com.docmala.parser.blocks.Admonition.Type.Note;
 
         for (com.docmala.parser.blocks.Admonition.Type b : com.docmala.parser.blocks.Admonition.Type.values()) {
@@ -65,7 +69,7 @@ public class AdmonitionPlugin implements IDocumentPlugin {
         }
 
         Parser parser = new Parser();
-        MemorySource memorySource = new MemorySource(start.fileName(), text, start.line() );
+        MemorySource memorySource = new MemorySource(start.fileName(), text, blockStart );
         try {
             parser.parse(memorySource, sourceProvider);
             document.append(new com.docmala.parser.blocks.Admonition(start, end, new ArrayDeque<>(), parser.document().content(), typeEnum));

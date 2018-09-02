@@ -228,7 +228,6 @@ public class ContentParser implements IBlockParser {
         content.setEnd(start.here());
         document.append(content.build());
 
-
         if (formattedText.isBold()) {
             errors.addLast(new Error(start.here(), "Bold formating (\"**\") was not closed."));
         }

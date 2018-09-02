@@ -40,12 +40,12 @@ public class PluginParser implements IBlockParser {
             while (!start.here().isBlockEnd()) {
                 start.moveForward();
             }
+            start.moveForward();
 
             dataBlockBuilder.setPosition(start.here());
 
             while (!start.here().isEof()) {
                 int endLevel = 0;
-                start.moveForward();
 
                 if (start.here().equals('-')) {
                     while (start.here().equals('-')) {
@@ -63,10 +63,12 @@ public class PluginParser implements IBlockParser {
                             block.append('-');
                         }
                         block.append(start.here().get());
+                        start.moveForward();
                         continue;
                     }
                 }
                 block.append(start.here().get());
+                start.moveForward();
             }
             return false;
         }
@@ -168,7 +170,7 @@ public class PluginParser implements IBlockParser {
                                     }
                                 }
                                 if(!found)
-                                 parameters.addLast(new Parameter(argSplitted[0], argSplitted[1], start.here()));
+                                 parameters.addLast(new Parameter(argSplitted[0], argSplitted[1], null, null));
                             }
                             break outerloop;
                         }
@@ -208,6 +210,7 @@ public class PluginParser implements IBlockParser {
                         parameterBuilder.setName(defaultParameter);
                         parameterBuilder.setPosition(parameter.position());
                         parameterBuilder.setValue(parameter.value());
+                        parameterBuilder.setValuePosition(parameter.valuePosition());
                         newParameters.addLast(parameterBuilder.build());
                     } else {
                         newParameters.addLast(parameter);

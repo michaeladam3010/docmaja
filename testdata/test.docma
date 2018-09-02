@@ -47,7 +47,7 @@ a, b, c, d
 . Test 3
 [csvtable, file="test.csv"]
 
-is equal to 
+is equal to
 
 CSVTABLE: test.csv
 

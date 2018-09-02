@@ -48,6 +48,7 @@ public class LoremPlugin implements IDocumentPlugin {
         Content.Builder cb = new Content.Builder();
         cb.addContent(textBuilder.build());
         cb.setStart(start);
+        cb.setEnd(end);
         document.append(cb.build());
     }
 }

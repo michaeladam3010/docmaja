@@ -54,7 +54,7 @@ void DocmaClient::onTextMessageReceived(const QString &message)
         ProjectExplorer::TaskHub::clearTasks(DocmaPreview::Constants::TASK_ID);
         QJsonValue result = msg["result"];
         if( result["head"] != QJsonValue::Undefined && result["body"] != QJsonValue::Undefined ) {
-            emit documentRendered(result["head"].toString(), result["body"].toString());
+            emit documentRendered(result["head"].toString(), result["body"].toString(), getIDs(result["ids"]));
         }
         if( result["errors"] != QJsonValue::Undefined ){
             ProjectExplorer::TaskHub::clearTasks(DocmaPreview::Constants::TASK_ID);
@@ -130,4 +130,17 @@ void DocmaClient::remoteGetFile(const QString &fileName, int resultId)
     QString msg = QString::fromLatin1(QJsonDocument(obj).toJson(QJsonDocument::Compact));
     qDebug() << "Sending: " << msg;
     m_webSocket.sendTextMessage(msg);
+}
+
+QMap<int, QPair<int, QString>> DocmaClient::getIDs(const QJsonValue &idNode) const
+{
+    auto ids = idNode.toArray();
+    QMap<int, QPair<int, QString>> result;
+    for( int i = 0; i < ids.size(); i++ ) {
+        const QJsonValue id = ids[i];
+        int start = id["start"].toInt();
+        QPair<int, QString> data{id["end"].toInt(), id["id"].toString()};
+        result.insert(start, data);
+    }
+    return result;
 }

@@ -3,6 +3,7 @@ package com.docmala.server;
 import com.docmala.Error;
 import com.docmala.parser.Parser;
 import com.docmala.plugins.ouput.Html;
+import com.docmala.plugins.ouput.Html.HtmlDocument;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
 import com.jsoniter.output.JsonStream;
@@ -87,11 +88,11 @@ public class Server extends WebSocketServer {
             }
 
             Html htmlOutput = new Html();
-            Html.HtmlDocument doc = htmlOutput.generate(p.document());
+            HtmlDocument doc = htmlOutput.generate(p.document());
 
             result = new RenderResult(doc, errors, data.toInt("id"));
         } catch (Exception e) {
-            Html.HtmlDocument doc = new Html.HtmlDocument();
+            HtmlDocument doc = new HtmlDocument();
             doc.body().append("<h1>Exception occured:").append(e.toString()).append("</h1>");
             for (StackTraceElement element : e.getStackTrace()) {
                 doc.body().append(element.toString()).append("</br>");
@@ -134,19 +135,21 @@ public class Server extends WebSocketServer {
         public final Result result;
         public final int id;
 
-        public RenderResult(com.docmala.plugins.ouput.Html.HtmlDocument html, ArrayDeque<RenderError> errors, int id) {
-            this.result = new Result(html.head().toString(), html.body().toString(), errors);
+        public RenderResult(HtmlDocument html, ArrayDeque<RenderError> errors, int id) {
+            this.result = new Result(html.head().toString(), html.body().toString(), html.ids(), errors);
             this.id = id;
         }
 
         static class Result {
             public final String head;
             public final String body;
+            public final ArrayDeque<HtmlDocument.IDInformation> ids;
             public final ArrayDeque<RenderError> errors;
 
-            Result(String head, String body, ArrayDeque<RenderError> errors) {
+            Result(String head, String body, ArrayDeque<HtmlDocument.IDInformation> ids, ArrayDeque<RenderError> errors) {
                 this.head = head;
                 this.body = body;
+                this.ids = ids;
                 this.errors = errors;
             }
         }

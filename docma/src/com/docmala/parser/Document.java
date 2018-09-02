@@ -34,6 +34,10 @@ public class Document implements IBlockHolder {
 
     @Override
     public void append(Block block) {
+        if( _content.size() > 0 && _content.getLast().start._position > block.start.position() ) {
+            int i = 0;
+        }
+
         if (block instanceof MetaData) {
             MetaData meta = (MetaData)block;
             if( _metadata.containsKey(meta.key) ) {

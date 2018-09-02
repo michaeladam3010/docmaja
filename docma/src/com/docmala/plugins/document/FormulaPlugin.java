@@ -93,6 +93,8 @@ public class FormulaPlugin implements IDocumentPlugin {
         Image.Builder imageBuilder = new Image.Builder();
         imageBuilder.setData(bytes);
         imageBuilder.setFileType("svg+xml");
+        imageBuilder.setStart(start);
+        imageBuilder.setEnd(end);
         document.append(imageBuilder.build());
     }
 

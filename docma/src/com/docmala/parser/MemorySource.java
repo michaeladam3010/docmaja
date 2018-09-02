@@ -10,12 +10,14 @@ public class MemorySource implements ISource {
     private String _fileLabel = "";
     private String _memory;
     private int _lineOffset = 0;
+    private int _positionOffset = 0;
 
     public MemorySource() {
     }
 
-    public MemorySource(String fileName, String memory, int lineOffset) {
-        _lineOffset = lineOffset;
+    public MemorySource(String fileName, String memory, SourcePosition start) {
+        _lineOffset = start.line();
+        _positionOffset = start.position();
         init(fileName, memory);
     }
 
@@ -102,15 +104,19 @@ public class MemorySource implements ISource {
 
     public class MemoryPosition extends Position {
 
-        protected int _index = -1;
-
         MemoryPosition() {
             this._fileName = MemorySource.this._fileName;
             _line += _lineOffset;
+            _position = -1;
+        }
+
+        @Override
+        public int position() {
+            return _position + _positionOffset;
         }
 
         MemoryPosition(MemoryPosition other) {
-            _index = other._index;
+            _position = other._position;
             _fileName = other._fileName;
             _column = other._column;
             _line = other._line;
@@ -124,19 +130,19 @@ public class MemorySource implements ISource {
 
         @Override
         public char get() {
-            return _index >= 0 && _index < _memory.length() ? _memory.charAt(_index) : '\0';
+            return _position >= 0 && _position < _memory.length() ? _memory.charAt(_position) : '\0';
         }
 
         @Override
         public boolean isEof() {
-            return _index >= _memory.length();
+            return _position >= _memory.length();
         }
 
         @Override
         public boolean isEscaped() {
             int pos = 1;
             boolean escaped = false;
-            while (_index - pos >= 0 && _memory.charAt(_index - pos) == '\\') {
+            while (_position - pos >= 0 && _memory.charAt(_position - pos) == '\\') {
                 escaped = !escaped;
                 pos++;
             }
@@ -145,16 +151,16 @@ public class MemorySource implements ISource {
 
         public void moveForward() {
             do {
-                if (_index >= 0) {
+                if (_position >= 0) {
                     if (isEof()) {
                         return;
                     }
 
-                    if (_memory.charAt(_index) == '\r') {
-                        _index++;
+                    if (_memory.charAt(_position) == '\r') {
+                        _position++;
                     }
 
-                    if (_memory.charAt(_index) == '\n') {
+                    if (_memory.charAt(_position) == '\n') {
                         _line++;
                         _column = 1;
                     } else {
@@ -162,27 +168,27 @@ public class MemorySource implements ISource {
                     }
                 }
 
-                _index++;
+                _position++;
 
 
                 if (isEof()) {
                     return;
                 }
-            } while (!_sourceCodeHandler.isPartOfDocumentation(_index, _memory));
+            } while (!_sourceCodeHandler.isPartOfDocumentation(_position, _memory));
 
-            if (_memory.charAt(_index) == '\\') {
+            if (_memory.charAt(_position) == '\\') {
                 _column++;
-                _index++;
+                _position++;
             }
 
             if (isEof()) {
                 return;
             }
 
-            if (_memory.charAt(_index) == '.' && (_index == 0 || _memory.charAt(_index - 1) != '\\')) {
-                if (_memory.length() > _index + 3 && _memory.charAt(_index + 1) == '.' && _memory.charAt(_index + 2) == '.') {
+            if (_memory.charAt(_position) == '.' && (_position == 0 || _memory.charAt(_position - 1) != '\\')) {
+                if (_memory.length() > _position + 3 && _memory.charAt(_position + 1) == '.' && _memory.charAt(_position + 2) == '.') {
                     MemoryPosition tst = new MemoryPosition();
-                    tst._index = _index + 3;
+                    tst._position = _position + 3;
                     tst._column = _column + 3;
                     tst._line = _line;
                     if (tst.isNewLine()) {
@@ -190,7 +196,7 @@ public class MemorySource implements ISource {
                         while (tst.isWhitespace()) {
                             tst.moveForward();
                         }
-                        _index = tst._index;
+                        _position = tst._position;
                         _column = tst._column;
                         _line = tst._line;
                     }

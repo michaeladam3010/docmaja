@@ -89,7 +89,7 @@ public class CSVTablePlugin implements IDocumentPlugin {
             lines.addLast(line);
             start.moveForward();
             start.skipWhitespaces();
-            begin = start.next().copy();
+            begin = start.here().copy();
             row++;
             col = 0;
         }
@@ -148,8 +148,8 @@ public class CSVTablePlugin implements IDocumentPlugin {
             return;
         }
 
-            if( block != null ) {
-            MemorySource source = new MemorySource(start.fileName(), block.data, start.line()+1);
+        if( block != null ) {
+            MemorySource source = new MemorySource(start.fileName(), block.data, block.position);
             parse(source, builder, separator, hasHeader != null, hasColumnHeader != null);
         }
         else if( file != null ) {

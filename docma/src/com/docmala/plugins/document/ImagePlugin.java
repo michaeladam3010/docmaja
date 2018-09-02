@@ -32,6 +32,8 @@ public class ImagePlugin implements IDocumentPlugin {
     public void process(SourcePosition start, SourcePosition end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
         Parameter file = null;
         Image.Builder image = new Image.Builder();
+        image.setStart(start);
+        image.setEnd(end);
 
         for (Parameter parameter : parameters) {
             if (parameter.name().equals("file")) {
