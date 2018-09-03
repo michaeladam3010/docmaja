@@ -4,11 +4,18 @@ import com.docmala.parser.*;
 import com.docmala.parser.blocks.*;
 import com.docmala.plugins.IOutput;
 import com.docmala.plugins.IOutputDocument;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
+import org.apache.batik.util.XMLResourceDescriptor;
 
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class Latex implements IOutput {
@@ -67,8 +74,13 @@ public class Latex implements IOutput {
     private long imageCounter = 0;
     private File workDir;
     private File sourceDir;
+    private PNGTranscoder imageTranscoder = new PNGTranscoder();
+
 
     public Latex(String inputFileName) throws Exception {
+        // register sax parser of xerces
+        XMLResourceDescriptor.setXMLParserClassName("org.apache.xerces.parsers.SAXParser");
+
         String folderName = getHashFromDocumentName(inputFileName);
         workDir = new File("/tmp/docmala/" + folderName);
         if(!workDir.exists()){
@@ -159,6 +171,34 @@ public class Latex implements IOutput {
 
     }
 
+    private String generateImageFile(String type, byte[] data) throws IOException, TranscoderException {
+        imageCounter++;
+        return generateImageFile(type, String.valueOf(imageCounter), data);
+    }
+
+    private String generateImageFile(String type, String name, byte[] data) throws IOException, TranscoderException {
+
+        name += ".";
+
+        if(type.equals("svg+xml")) {
+            name += "png";
+            // todo: improve quality settings
+            TranscoderInput input = new TranscoderInput(new ByteArrayInputStream(data));
+            FileOutputStream writer = new FileOutputStream(workDir.toString() + "/" + name);
+            TranscoderOutput output = new TranscoderOutput(writer);
+            imageTranscoder.transcode(input, output);
+            writer.flush();
+            writer.close();
+        } else {
+            name += type;
+            FileOutputStream writer = new FileOutputStream(workDir.toString() + "/" + name);
+            writer.write(data);
+            writer.flush();
+            writer.close();
+        }
+        return name;
+    }
+
     private void generateContent(StringBuffer content, Content block) {
         StringBuilder tempContent = new StringBuilder();
         for (FormattedText text : block.content()) {
@@ -182,45 +222,16 @@ public class Latex implements IOutput {
             } else if (text instanceof FormattedText.Image) {
                 FormattedText.Image image = (FormattedText.Image)text;
 
-                String fileType = image.fileType;
-
-                if(fileType.equals("svg+xml"))
-                    fileType = "svg";
-
-                imageCounter++;
-
-                String fileName = String.valueOf(imageCounter) + "." + fileType;
-
-                FileOutputStream writer = null;
                 try {
-                    writer = new FileOutputStream(workDir.toString() + "/" + fileName);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    if (writer != null) {
-                        writer.write(image.data);
-                    }
+                    String fileName = generateImageFile(image.fileType, image.data);
+                    tempContent.append("\\scalerel*{\\includegraphics[height=10pt]{").append(fileName).append("}}{B}").append(System.lineSeparator());
                 } catch (IOException e) {
                     e.printStackTrace();
-                } finally {
-                    try {
-                        if (writer != null) {
-                            writer.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                } catch (TranscoderException e) {
+                    e.printStackTrace();
                 }
 
-                if(fileType.equals("svg")) {
-                    tempContent.append("\\scalerel*{\\includesvg[clean,pdf]{").append(fileName).append("}}{B}").append(System.lineSeparator());
-                } else {
-                    tempContent.append("\\scalerel*{\\includegraphics[height=10pt]{").append(fileName).append("}}{B}").append(System.lineSeparator());
-                }
-
-            }
-            else {
+            } else {
                 FormattedText.Style style = text.style;
 
                 if(style == null) {
@@ -351,59 +362,27 @@ public class Latex implements IOutput {
     }
 
     private void generateImage(StringBuffer content, Image block) {
-        String fileType = block.fileType;
 
-        if(fileType.equals("svg+xml"))
-            fileType = "svg";
-
-        imageCounter++;
-
-        String fileName = String.valueOf(imageCounter) + "." + fileType;
-
-        FileOutputStream writer = null;
         try {
-            writer = new FileOutputStream(workDir.toString() + "/" + fileName);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            if (writer != null) {
-                writer.write(block.data);
+            String fileName = generateImageFile(block.fileType, block.data);
+            content.append("\\begin{figure}[htbp!]").append(System.lineSeparator());
+            content.append("\\centering").append(System.lineSeparator());
+            content.append("\\includegraphics{").append(fileName).append("}").append(System.lineSeparator());
+            if(block.caption != null){
+                StringBuilder capText = new StringBuilder();
+                Caption caption = block.caption;
+                Content capContent = (Content) caption.content;
+                for (FormattedText text : capContent.content()) {
+                    capText.append(text.text);
+                }
+                content.append("\\caption{").append(capText).append("}").append(System.lineSeparator());
             }
+            content.append("\\end{figure}").append(System.lineSeparator());
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } catch (TranscoderException e) {
+            e.printStackTrace();
         }
-
-        content.append("\\begin{figure}[htbp!]").append(System.lineSeparator());
-        content.append("\\centering").append(System.lineSeparator());
-
-
-        if(fileType.equals("svg"))
-            content.append("\\includesvg[clean,pdf,pretex=\\relscale{0.9}]{").append(fileName).append("}").append(System.lineSeparator());
-        else{
-            content.append("\\includegraphics{").append(fileName).append("}").append(System.lineSeparator());
-        }
-
-        if(block.caption != null){
-            StringBuilder capText = new StringBuilder();
-            Caption caption = block.caption;
-            Content capContent = (Content) caption.content;
-            for (FormattedText text : capContent.content()) {
-                capText.append(text.text);
-            }
-
-            content.append("\\caption{").append(capText).append("}").append(System.lineSeparator());
-        }
-
-        content.append("\\end{figure}").append(System.lineSeparator());
     }
 
     private void generateList(StringBuffer content, List block) {
@@ -553,11 +532,24 @@ public class Latex implements IOutput {
         content.append("\\end{tabular}\\captionof{table}{").append(capText).append("}\\end{center}").append(System.lineSeparator());
     }
 
-    private void generateAdmonition(StringBuffer content, Admonition block) {
-        content.append("\\begin{tcolorbox}[sidebyside,halign upper=center, lefthand width=0.7cm, title={\\large ").append(block.type.name()).append("}]");
-        // todo find a better way to handle path of admonition symbols
-        content.append("\\includesvg[clean,pdf,height=20pt]{").append(sourceDir.toString()).append("/../docma/resources/ad/").append(block.type.name().toLowerCase()).append("}");
+    private HashMap<String, String> generatedAdmonitionIcons = new HashMap<>();
 
+    private void generateAdmonition(StringBuffer content, Admonition block) {
+        String name = block.type.name().toLowerCase();
+        if( !generatedAdmonitionIcons.containsKey(name)) {
+            InputStream resource = getClass().getClassLoader().getResourceAsStream("ad/" + name + ".svg");
+            try {
+                byte[] bytes = resource.readAllBytes();
+                String file = generateImageFile("svg+xml", name, bytes);
+                generatedAdmonitionIcons.put(name, file);
+            } catch (Exception e) {
+            }
+        }
+
+        String file = generatedAdmonitionIcons.get(name);
+
+        content.append("\\begin{tcolorbox}[sidebyside,halign upper=center, lefthand width=0.7cm, title={\\large ").append(block.type.name()).append("}]");
+        content.append("\\includegraphics[height=20pt]{").append(file).append("}");
         content.append("\\tcblower").append(System.lineSeparator());
 
         for (Block part : block.content) {

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.BreakIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,12 +31,22 @@ public class Main {
         Set<String> keys = stringAnyMap.keySet();
 
         for( String key : keys) {
-            String aChar = stringAnyMap.get(key).get("char").toString();
-            int i1 = aChar.codePointAt(0);
-            String name = Integer.toHexString(i1);
-            if( aChar.length() == 4 ) {
-                int i2 = aChar.codePointAt(2);
-                name = name + "-" + Integer.toHexString(i2);
+            String character = stringAnyMap.get(key).get("char").toString();
+            String name = "";
+
+            BreakIterator characterInstance = BreakIterator.getCharacterInstance();
+            characterInstance.setText(character);
+
+            int len = character.length();
+            for( int i = 0; i < len; ) {
+                int hex = character.codePointAt(i);
+                i += Character.charCount(hex);
+                if( i >= len && hex == 0xfe0f )
+                    continue;
+                if( !name.isEmpty() ) {
+                    name = name + "-";
+                }
+                name = name + Integer.toHexString(hex);
             }
             try {
                 File from = new File(args[1] + "/" + name + ".svg");
@@ -43,7 +54,14 @@ public class Main {
                     File to = new File(args[2] + "/" + key + ".svg");
                     Files.copy(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } else {
-                    System.out.println("Unable to create: " + key + ": " + name);
+                    name = name.replaceAll("-fe0f", "");
+                    from = new File(args[1] + "/" + name + ".svg");
+                    if( from.exists() ) {
+                        File to = new File(args[2] + "/" + key + ".svg");
+                        Files.copy(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    } else {
+                        System.out.println("Unable to create: " + key + ": " + name);
+                    }
                 }
             } catch (Exception e) {
                 System.out.println("Unable to create: " + key + ": " + name);
