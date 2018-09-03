@@ -1,1 +1,0 @@
-antlr4 -package com.docmala.plugins.document.internal_formula.antlr -no-listener -visitor -o . VanesaFormula.g4
