@@ -116,7 +116,9 @@ public class ContentParser implements IBlockParser {
                 return true;
             } else if( start.here().isWhitespace() ) {
                 start.setTo(begin);
-                return false;
+                parseFormattedText(start, true);
+                // this wasn't an image but we return true here since we parsed some text
+                return true;
             }
             text.append(start.here().get());
             start.moveForward();
@@ -168,8 +170,12 @@ public class ContentParser implements IBlockParser {
     }
 
     void parseFormattedText(ISource.Window start) {
+        parseFormattedText(start, false);
+    }
+
+    void parseFormattedText(ISource.Window start, boolean ignoreSpecialElements) {
         StringBuilder text = new StringBuilder();
-        while (!start.here().isBlockEnd() && !isLinkStart(start) && !isAnchorStart(start) && !isImageStart(start)) {
+        while (!start.here().isBlockEnd() && (ignoreSpecialElements || (!isLinkStart(start) && !isAnchorStart(start) && !isImageStart(start))) ) {
             if (!start.here().isEscaped() && !start.next().isEscaped() && (
                     start.equals('*', '*') ||
                             start.equals('/', '/') ||
