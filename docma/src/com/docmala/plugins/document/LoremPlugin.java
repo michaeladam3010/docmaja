@@ -36,11 +36,27 @@ public class LoremPlugin implements IDocumentPlugin {
     public void process(SourcePosition start, SourcePosition end, ArrayDeque<Parameter> parameters, DataBlock block, Document document, ISourceProvider sourceProvider) {
         String[] loremIpsumSeperated = loremIpsum.split(" ");
         String loremIpsumOutput = "";
+        int min = 35;
+        int max = 35;
 
-        int randomNum = ThreadLocalRandom.current().nextInt(10, loremIpsumSeperated.length);
+        for (Parameter parameter : parameters) {
+            if (parameter.name().equals("min")) {
+                min = Integer.parseInt(parameter.value());
+                break;
+            }
+            if (parameter.name().equals("max")) {
+                max = Integer.parseInt(parameter.value());
+                break;
+            }
+        }
+
+
+        int randomNum = 35;
+        if( min < max )
+            randomNum = ThreadLocalRandom.current().nextInt(min, max);
 
         for (int i= 0; i < randomNum; i++){
-            loremIpsumOutput += loremIpsumSeperated[i] + " ";
+            loremIpsumOutput += loremIpsumSeperated[i%loremIpsumSeperated.length] + " ";
         }
 
         FormattedText.Builder textBuilder = new FormattedText.Builder();

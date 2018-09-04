@@ -158,7 +158,9 @@ test //italic// __**bold underline**__ ''mono'' --stroked--
 . [listing] A formula
 [formula]
 ----
-(a_1 / (b_1 + sqrt(c))^2) + sin(a_2 * b_2)
+\\Re{z} =\\frac{n\\pi \\dfrac{\\theta +\\psi}{2}}{
+            \\left(\\dfrac{\\theta +\\psi}{2}\\right)^2 + \\left( \\dfrac{1}{2}
+            \\log \\left\\vert\\dfrac{B}{A}\\right\\vert\\right)^2}.
 ----
 
 [lorem]
